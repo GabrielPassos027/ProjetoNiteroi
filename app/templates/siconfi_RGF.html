@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SICONFI Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        select, input[type="text"], input[type="submit"] {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .summary {
+            margin-bottom: 20px;
+        }
+        #rreoSection, #rgfSection {
+            display: none;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("RREO").addEventListener("click", function() {
+                document.getElementById("rreoSection").style.display = "block";
+                document.getElementById("rgfSection").style.display = "none";
+            });
+            document.getElementById("RGF").addEventListener("click", function() {
+                document.getElementById("rreoSection").style.display = "none";
+                document.getElementById("rgfSection").style.display = "block";
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <h1>Dados RGF SICONFI</h1>
+    <div class="button-container">
+        <a href="{{ url_for('main.siconfi_bases') }}"><button>Voltar</button></a>
+    </div>
+    <form method="post">
+        <div>
+            <label for="an_exercicio">Data:</label>
+            <select name="an_exercicio" id="an_exercicio">
+                {% for year in range(2015, 2024) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="nr_periodo">Quadrimestre:</label>
+            <select name="nr_periodo" id="nr_periodo">
+                {% for period in range(1, 4) %}
+                    <option value="{{ period }}">{{ period }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="no_anexo">Anexo:</label>
+            <input type="text" id="no_anexo" name="no_anexo" value="RGF-Anexo 02" readonly>
+        </div>
+        <div>
+            <label for="co_tipo_demonstrativo">Tipo Demonstrativo:</label>
+            <input type="text" id="co_tipo_demonstrativo" name="co_tipo_demonstrativo" value="RGF" readonly>
+        </div>
+        <div>
+            <label for="co_esfera">Esfera:</label>
+            <input type="text" id="co_esfera" name="co_esfera" value="Estadual" readonly>
+        </div>
+        <div>
+            <label for="id_ente">ID Ente:</label>
+            <input type="text" id="id_ente" name="id_ente" value="33" readonly>
+        </div>
+        <div>
+            <input type="submit" value="Buscar Dados">
+        </div>
+    </form>
+    {% if data_count > 0 %}
+        <div class="results">
+            <h2>Resultado da busca ({{ data_count }} dados encontrados):</h2>
+            <div class="summary">
+                <p><strong>Resumo da busca:</strong></p>
+                <p>Ano: {{ an_exercicio }}, Quadrimestre: {{ nr_periodo }}, Anexo: RGF-Anexo 02, Tipo Demonstrativo: RGF, Esfera: Estadual, ID Ente: 33</p>
+            </div>
+            
+            <!-- <button id="saveButton">Salvar no Banco de Dados</button> -->
+            <form method="post" action="{{ url_for('main.salvar_dado_RGF') }}">
+                <input type="hidden" name="an_exercicio" value="{{ an_exercicio }}">
+                <input type="hidden" name="nr_periodo" value="{{ nr_periodo }}">
+                <button type="submit">Salvar Dado</button>
+            </form>
+            
+            
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Conta</th>
+                        <th>Código Conta</th>
+                        <th>Coluna</th>
+                        <th>Valor</th>
+                        <th>Código IBGE</th>
+                        <th>População</th>
+                        <th>Instituição</th>
+                        <th>ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                        <tr>
+                            <td>{{ item.conta }}</td>
+                            <td>{{ item.cod_conta }}</td>
+                            <td>{{ item.coluna }}</td>
+                            <td>{{ item.valor }}</td>
+                            <td>{{ item.cod_ibge }}</td>
+                            <td>{{ item.populacao }}</td>
+                            <td>{{ item.instituicao }}</td>
+                            <td>{{ item.get('conta') }}{{ item.get('coluna') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="results">
+            <h2>Nenhum dado encontrado para a busca realizada.</h2>
+            <div class="summary">
+                <p><strong>Resumo da busca:</strong></p>
+                <p>Nenhuma busca realizada</p>
+            </div>
+        </div>
+    {% endif %}
+</body>
+</html>

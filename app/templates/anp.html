@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dados da ANP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Dados da ANP</h1>
+    {% if data %}
+        <table>
+            <tr>
+                <th>Período</th>
+                <th>Valor</th>
+            </tr>
+            {% for entry in data %}
+                <tr>
+                    <td>{{ entry['period'] }}</td>
+                    <td>{{ entry['value'] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Falha ao buscar dados da ANP.</p>
+    {% endif %}
+</body>
+</html>
