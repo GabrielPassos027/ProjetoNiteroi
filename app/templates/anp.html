@@ -2,26 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dados da ANP</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados ANP</title>
 </head>
 <body>
-    <h1>Dados da ANP</h1>
-    {% if data %}
-        <table>
+    <h1>Dados ANP</h1>
+    <table border="1">
+        <thead>
             <tr>
                 <th>Período</th>
+                <th>Produto</th>
+                <th>Nome do Produto</th>
+                <th>Processo</th>
+                <th>Nome do Processo</th>
                 <th>Valor</th>
+                <th>Unidades</th>
             </tr>
-            {% for entry in data %}
-                <tr>
-                    <td>{{ entry['period'] }}</td>
-                    <td>{{ entry['value'] }}</td>
-                </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+            <tr>
+                <td>{{ item['period'] }}</td>
+                <td>{{ item['product'] }}</td>
+                <td>{{ item['product-name'] }}</td>
+                <td>{{ item['process'] }}</td>
+                <td>{{ item['process-name'] }}</td>
+                <td>{{ item['value'] }}</td>
+                <td>{{ item['units'] }}</td>
+            </tr>
             {% endfor %}
-        </table>
-    {% else %}
-        <p>Falha ao buscar dados da ANP.</p>
-    {% endif %}
+        </tbody>
+    </table>
 </body>
 </html>

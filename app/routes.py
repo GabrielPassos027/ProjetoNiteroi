@@ -7,6 +7,7 @@ import pytz
 import os
 from app.controllers.anp_controller import fetch_anp_data
 from app.utils.web_scraper import download_next_focus_report
+from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
 
@@ -116,13 +117,55 @@ def download_next_report():
     download_next_focus_report()
     return redirect(url_for('main.index'))
 
-
 @main.route('/anp')
 def anp():
     data = fetch_anp_data()
-    print(f"API response: {data}")  # Adiciona a resposta da API no log
-    if data and 'response' in data and 'data' in data['response']:
-        anp_data = data['response']['data']
-    else:
-        anp_data = None
-    return render_template('anp.html', data=anp_data)
+    return render_template('anp.html', data=data) 
+
+@main.route('/upload_rreo', methods=['GET', 'POST'])
+def upload_rreo():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            print("Nenhum arquivo selecionado")
+            return 'Nenhum arquivo selecionado'
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            print("Nenhum arquivo selecionado")
+            return 'Nenhum arquivo selecionado'
+        
+        if file:
+            # Salva o arquivo no diretório da área de trabalho do usuário atual
+            filename = secure_filename(file.filename)
+            desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+            upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
+            
+            # Imprime o caminho completo do diretório
+            print(f"Caminho do diretório de upload: {upload_folder}")
+            
+            # Cria o diretório se não existir
+            if not os.path.exists(upload_folder):
+                try:
+                    os.makedirs(upload_folder)
+                    print(f"Diretório criado: {upload_folder}")
+                except Exception as e:
+                    print(f"Erro ao criar o diretório: {e}")
+                    return f"Erro ao criar o diretório: {e}"
+            else:
+                print(f"Diretório já existe: {upload_folder}")
+            
+            file_path = os.path.join(upload_folder, filename)
+            
+            # Imprime o caminho completo do arquivo
+            print(f"Caminho completo do arquivo: {file_path}")
+            
+            try:
+                file.save(file_path)
+                print(f'Arquivo salvo em: {file_path}')
+                return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}'
+            except Exception as e:
+                print(f"Erro ao salvar o arquivo: {e}")
+                return f"Erro ao salvar o arquivo: {e}"
+    
+    return render_template('upload_rreo.html')
