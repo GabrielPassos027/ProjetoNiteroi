@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 import os
 from app.controllers.anp_controller import fetch_anp_data
-from app.utils.web_scraper import download_next_focus_report
+from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
 
 main = Blueprint('main', __name__)
@@ -115,6 +115,7 @@ def salvar_dado_RGF():
 @main.route('/download_next_report')
 def download_next_report():
     download_next_focus_report()
+    convert_all_pdfs()
     return redirect(url_for('main.index'))
 
 @main.route('/anp')
