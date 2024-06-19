@@ -96,3 +96,82 @@ download_next_focus_report()
 
 # Converter todos os PDFs existentes para CSV
 convert_all_pdfs()
+
+
+# import os
+# import datetime
+# import requests
+
+# # Função para baixar o PDF a partir de um URL e salvar em um diretório
+# def download_focus_pdf(url, filename):
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         with open(filename, 'wb') as f:
+#             f.write(response.content)
+#         print(f"PDF '{filename}' baixado com sucesso!")
+#     else:
+#         print(f"Falha ao baixar o PDF '{filename}'")
+
+# # Função para obter a data atual
+# def get_current_date():
+#     return datetime.date.today()
+
+# # Função para gerar URLs dos PDFs do FOCUS a partir de uma data inicial até a data atual
+# def generate_pdf_urls(start_date, end_date):
+#     base_url = "https://www.bcb.gov.br/content/focus/focus/"
+#     current_date = start_date
+#     while current_date <= end_date:
+#         # Formata a data no formato inverso para o nome do PDF
+#         pdf_date = current_date.strftime("%Y%m%d")
+#         pdf_url = f"{base_url}R{pdf_date}.pdf"
+#         yield pdf_url
+#         current_date += datetime.timedelta(days=7)
+
+# # Função para criar uma pasta se não existir
+# def create_directory_if_not_exists(directory):
+#     if not os.path.exists(directory):
+#         os.makedirs(directory)
+
+# # Função para verificar se um arquivo existe em um diretório
+# def file_exists(directory, filename):
+#     return os.path.exists(os.path.join(directory, filename))
+
+# # Pasta onde os PDFs serão salvos (área de trabalho)
+# desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+
+# # Pasta para os PDFs do FOCUS
+# focus_folder = os.path.join(desktop_path, 'FOCUS')
+# create_directory_if_not_exists(focus_folder)
+
+# # Data inicial para começar a busca dos relatórios (primeiro relatório disponível)
+# start_date = datetime.date(2019, 1, 4)
+
+# # Data atual
+# end_date = get_current_date()
+
+# # Verificar se os PDFs de todos os anos estão baixados
+# all_downloads_exist = True
+# for year in range(start_date.year, end_date.year + 1):
+#     pdf_year_folder = os.path.join(focus_folder, str(year))
+#     if not os.path.exists(pdf_year_folder):
+#         all_downloads_exist = False
+#         break
+#     for pdf_date in generate_pdf_urls(datetime.date(year, 1, 1), datetime.date(year, 12, 31)):
+#         pdf_filename = f"{pdf_date.split('/')[-1][1:-4]}.pdf"
+#         if not file_exists(pdf_year_folder, pdf_filename):
+#             all_downloads_exist = False
+#             break
+
+# # Baixar os PDFs se algum deles não existir
+# if not all_downloads_exist:
+#     print("Baixando PDFs do FOCUS...")
+#     for pdf_url in generate_pdf_urls(start_date, end_date):
+#         pdf_date = pdf_url.split('/')[-1].split('.')[0][1:]  # Extrai a data do URL
+#         pdf_year = pdf_date[:4]  # Ano do PDF
+#         pdf_folder = os.path.join(focus_folder, pdf_year)
+#         create_directory_if_not_exists(pdf_folder)
+#         pdf_filename = os.path.join(pdf_folder, f"{pdf_date}.pdf")
+#         download_focus_pdf(pdf_url, pdf_filename)
+#     print("Downloads concluídos.")
+# else:
+#     print("Todos os PDFs do FOCUS já foram baixados.")
