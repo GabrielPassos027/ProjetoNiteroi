@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPCA</title>
+</head>
+<body>
+    <h1>Dados do IPCA</h1>
+    <table border="1">
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item['V'] }}</td>
+                    <td>{{ item['D3C'] }}</td>
+                    <td>{{ item['D4N'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

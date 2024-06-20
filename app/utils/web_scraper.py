@@ -95,7 +95,7 @@ def convert_all_pdfs():
 download_next_focus_report()
 
 # Converter todos os PDFs existentes para CSV
-convert_all_pdfs()
+# convert_all_pdfs()
 
 
 # import os

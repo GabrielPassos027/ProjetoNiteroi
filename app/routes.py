@@ -6,6 +6,7 @@ from datetime import datetime
 import pytz
 import os
 from app.controllers.anp_controller import fetch_anp_data
+from app.controllers.ibge_controller import fetch_ipca_data, fetch_unemployment_data
 from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
 
@@ -170,3 +171,25 @@ def upload_rreo():
                 return f"Erro ao salvar o arquivo: {e}"
     
     return render_template('upload_rreo.html')
+
+@main.route('/ibge')
+def ibge():
+    return render_template('ibge.html')
+
+@main.route('/ibge/ipca')
+def ibge_ipca():
+    try:
+        data = fetch_ipca_data()
+        return render_template('ibge_ipca.html', data=data)
+    except Exception as e:
+        current_app.logger.error(f"Erro ao obter dados do IPCA: {str(e)}")
+        return f"Erro ao obter dados do IPCA: {str(e)}"
+
+@main.route('/ibge/unemployment')
+def ibge_unemployment():
+    try:
+        data = fetch_unemployment_data()
+        return render_template('ibge_unemployment.html', data=data)
+    except Exception as e:
+        current_app.logger.error(f"Erro ao obter dados de Desemprego: {str(e)}")
+        return f"Erro ao obter dados de Desemprego: {str(e)}"
