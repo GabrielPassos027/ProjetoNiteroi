@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Siconfi RREO/RGF</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="./output.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload de Arquivo RREO/RGF</h1>
+    <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <label for="file">Selecione um arquivo:</label>
+        <input type="file" name="file" id="file" required>
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('POST', '{{ url_for("main.upload_siconfi") }}', true);
+
+            xhr.onload = function() {
+                var messageDiv = document.getElementById('message');
+                if (xhr.status === 200) {
+                    messageDiv.textContent = xhr.responseText;
+                    messageDiv.className = 'message success';
+                } else {
+                    messageDiv.textContent = 'Erro ao fazer upload: ' + xhr.responseText;
+                    messageDiv.className = 'message error';
+                }
+                messageDiv.style.display = 'block';
+            };
+
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>

@@ -4,19 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPCA</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+        }
+    </style>
 </head>
 <body>
     <h1>Dados do IPCA</h1>
-    <table border="1">
+    <table id="ipcaTable">
+        <thead>
+            <tr>
+                <th>
+                    Variável<br>
+                    <select id="variableFilter" class="filter-select">
+                        <option value="">Todos</option>
+                        {% for option in variable_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                <th>
+                    Unidade<br>
+                    <select id="unitFilter" class="filter-select">
+                        <option value="">Todos</option>
+                        {% for option in unit_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                <th>
+                    Valor<br>
+                    <select id="valueFilter" class="filter-select">
+                        <option value="">Todos</option>
+                        {% for option in value_options %}
+                            <option value="{{ option }}">{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+            </tr>
+        </thead>
         <tbody>
             {% for item in data %}
                 <tr>
-                    <td>{{ item['V'] }}</td>
                     <td>{{ item['D3C'] }}</td>
+                    <td>{{ item['V'] }}</td>
                     <td>{{ item['D4N'] }}</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const variableFilter = document.getElementById('variableFilter');
+            const unitFilter = document.getElementById('unitFilter');
+            const valueFilter = document.getElementById('valueFilter');
+            const table = document.getElementById('ipcaTable').getElementsByTagName('tbody')[0];
+
+            function filterTable() {
+                const variableFilterValue = variableFilter.value.toLowerCase();
+                const unitFilterValue = unitFilter.value.toLowerCase();
+                const valueFilterValue = valueFilter.value.toLowerCase();
+
+                for (const row of table.rows) {
+                    const variableText = row.cells[0].textContent.toLowerCase();
+                    const unitText = row.cells[1].textContent.toLowerCase();
+                    const valueText = row.cells[2].textContent.toLowerCase();
+
+                    row.style.display = 
+                        (variableText.includes(variableFilterValue) &&
+                        unitText.includes(unitFilterValue) &&
+                        valueText.includes(valueFilterValue)) ? '' : 'none';
+                }
+            }
+
+            variableFilter.addEventListener('change', filterTable);
+            unitFilter.addEventListener('change', filterTable);
+            valueFilter.addEventListener('change', filterTable);
+        });
+    </script>
 </body>
 </html>

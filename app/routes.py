@@ -124,53 +124,46 @@ def anp():
     data = fetch_anp_data()
     return render_template('anp.html', data=data) 
 
-@main.route('/upload_rreo', methods=['GET', 'POST'])
-def upload_rreo():
+@main.route('/upload_siconfi', methods=['GET', 'POST'])
+def upload_siconfi():
     if request.method == 'POST':
         if 'file' not in request.files:
-            print("Nenhum arquivo selecionado")
-            return 'Nenhum arquivo selecionado'
+            return 'Nenhum arquivo selecionado', 400
         
         file = request.files['file']
         
         if file.filename == '':
-            print("Nenhum arquivo selecionado")
-            return 'Nenhum arquivo selecionado'
+            return 'Nenhum arquivo selecionado', 400
         
         if file:
             # Salva o arquivo no diretório da área de trabalho do usuário atual
             filename = secure_filename(file.filename)
             desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-            upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
             
-            # Imprime o caminho completo do diretório
-            print(f"Caminho do diretório de upload: {upload_folder}")
+            # Determine o diretório de upload com base no nome do arquivo
+            if "finbraRREO" in filename:
+                upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
+            elif "finbraRGF" in filename:
+                upload_folder = os.path.join(desktop_path, 'uploads', 'rgf')
+            else:
+                return 'Nome de arquivo não reconhecido', 400
             
             # Cria o diretório se não existir
             if not os.path.exists(upload_folder):
                 try:
                     os.makedirs(upload_folder)
-                    print(f"Diretório criado: {upload_folder}")
                 except Exception as e:
-                    print(f"Erro ao criar o diretório: {e}")
-                    return f"Erro ao criar o diretório: {e}"
-            else:
-                print(f"Diretório já existe: {upload_folder}")
+                    return f"Erro ao criar o diretório: {e}", 500
             
             file_path = os.path.join(upload_folder, filename)
             
-            # Imprime o caminho completo do arquivo
-            print(f"Caminho completo do arquivo: {file_path}")
-            
             try:
                 file.save(file_path)
-                print(f'Arquivo salvo em: {file_path}')
-                return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}'
+                return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
             except Exception as e:
-                print(f"Erro ao salvar o arquivo: {e}")
-                return f"Erro ao salvar o arquivo: {e}"
+                return f"Erro ao salvar o arquivo: {e}", 500
     
-    return render_template('upload_rreo.html')
+    return render_template('upload_siconfi.html')
 
 @main.route('/ibge')
 def ibge():
@@ -179,11 +172,12 @@ def ibge():
 @main.route('/ibge/ipca')
 def ibge_ipca():
     try:
-        data = fetch_ipca_data()
-        return render_template('ibge_ipca.html', data=data)
+        data, variable_options, unit_options, value_options = fetch_ipca_data()
+        return render_template('ibge_ipca.html', data=data, variable_options=variable_options, unit_options=unit_options, value_options=value_options)
     except Exception as e:
         current_app.logger.error(f"Erro ao obter dados do IPCA: {str(e)}")
         return f"Erro ao obter dados do IPCA: {str(e)}"
+
 
 @main.route('/ibge/unemployment')
 def ibge_unemployment():
