@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 import os
 from app.controllers.anp_controller import fetch_anp_data
-from app.controllers.ibge_controller import fetch_ipca_data, fetch_unemployment_data
+from app.controllers.ibge_controller import fetch_ipca_data, fetch_unemployment_data, download_caged_data
 from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
 
@@ -187,3 +187,11 @@ def ibge_unemployment():
     except Exception as e:
         current_app.logger.error(f"Erro ao obter dados de Desemprego: {str(e)}")
         return f"Erro ao obter dados de Desemprego: {str(e)}"
+    
+@main.route('/download_caged_data')
+def download_caged_data_route():
+    try:
+        file_path = download_caged_data()
+        return f'Download realizado com sucesso. Arquivo salvo em: {file_path}'
+    except Exception as e:
+        return f'Erro ao baixar o arquivo: {str(e)}'

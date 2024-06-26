@@ -1,6 +1,10 @@
 import requests
 import time
 
+import os
+from bs4 import BeautifulSoup
+import pandas as pd
+
 lista_url = [
     "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63/p/first%206/c315/all/d/v63%202",
     "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63/p/202007,202008,202009,202010,202011,202012/c315/all/d/v63%202",
@@ -41,3 +45,40 @@ def fetch_unemployment_data():
         return response.json()
     else:
         raise Exception(f"Erro na requisição Desemprego: {response.status_code}")
+    
+
+def download_caged_data():
+    url = "http://pdet.mte.gov.br/novo-caged"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    item = soup.find("li", class_="item-6225")
+    if item:
+        file_url = item.find("a")["href"]
+        full_file_url = "http://pdet.mte.gov.br" + file_url
+
+        response = requests.get(full_file_url)
+        if response.status_code == 200:
+            desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+            download_folder = os.path.join(desktop_path, "IBGE-Postos de Trabalho")
+            os.makedirs(download_folder, exist_ok=True)
+            temp_file_path = os.path.join(download_folder, "temp_download.xlsx")
+
+            with open(temp_file_path, "wb") as file:
+                file.write(response.content)
+
+            # Processar o arquivo Excel e extrair a aba "Tabela 8.1"
+            df = pd.read_excel(temp_file_path, sheet_name="Tabela 8.1")
+
+            # Salvar apenas a aba "Tabela 8.1"
+            final_file_path = os.path.join(download_folder, "Tabela_8_1.xlsx")
+            df.to_excel(final_file_path, index=False)
+
+            # Remover o arquivo temporário
+            os.remove(temp_file_path)
+
+            return final_file_path
+        else:
+            raise Exception("Erro ao baixar o arquivo")
+    else:
+        raise Exception("Elemento com a classe 'item-6225' não encontrado")
