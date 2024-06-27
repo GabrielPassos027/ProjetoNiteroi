@@ -4,6 +4,9 @@ import time
 import os
 from bs4 import BeautifulSoup
 import pandas as pd
+import shutil
+from openpyxl import load_workbook
+
 
 lista_url = [
     "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63/p/first%206/c315/all/d/v63%202",
@@ -52,9 +55,9 @@ def download_caged_data():
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    item = soup.find("li", class_="item-6225")
-    if item:
-        file_url = item.find("a")["href"]
+    links = soup.find_all("a", text="3. Tabelas.xlsx")
+    if links:
+        file_url = links[0]["href"]
         full_file_url = "http://pdet.mte.gov.br" + file_url
 
         response = requests.get(full_file_url)
@@ -67,18 +70,56 @@ def download_caged_data():
             with open(temp_file_path, "wb") as file:
                 file.write(response.content)
 
-            # Processar o arquivo Excel e extrair a aba "Tabela 8.1"
-            df = pd.read_excel(temp_file_path, sheet_name="Tabela 8.1")
+            # Carregar o arquivo Excel usando pandas
+            xls = pd.ExcelFile(temp_file_path)
 
-            # Salvar apenas a aba "Tabela 8.1"
-            final_file_path = os.path.join(download_folder, "Tabela_8_1.xlsx")
-            df.to_excel(final_file_path, index=False)
+            # Verificar se a aba "Tabela 8.1" existe
+            if "Tabela 8.1" in xls.sheet_names:
+                df = pd.read_excel(xls, sheet_name="Tabela 8.1")
 
-            # Remover o arquivo temporário
-            os.remove(temp_file_path)
+                # Corrigir os nomes das colunas removendo "Unnamed" e ajustando a formatação
+                df.columns = [col if 'Unnamed' not in col else '' for col in df.columns]
 
-            return final_file_path
+                # Salvar a aba específica em um novo arquivo Excel
+                final_file_path = os.path.join(download_folder, "Tabela_8_1.xlsx")
+                with pd.ExcelWriter(final_file_path, engine='openpyxl') as writer:
+                    df.to_excel(writer, sheet_name="Tabela 8.1", index=False)
+
+                # Fechar o arquivo Excel para liberar o recurso
+                xls.close()
+
+                # Mesclar as células no arquivo final
+                wb = load_workbook(final_file_path)
+                ws = wb["Tabela 8.1"]
+
+                # Mesclar E5:H5
+                ws.merge_cells('E5:H5')
+                # Mesclar B5:B6
+                ws.merge_cells('B5:B6')
+                # Mesclar C5:C6
+                ws.merge_cells('C5:C6')
+                # Mesclar D5:D6
+                ws.merge_cells('D5:D6')
+
+                # Lógica para mesclar células a partir de I5 até que não haja mais conteúdo
+                start_col = 9  # Coluna I
+                row = 5
+
+                while True:
+                    if ws.cell(row=row, column=start_col).value:
+                        end_col = start_col + 4  # Mescla 5 colunas à direita
+                        ws.merge_cells(start_row=row, start_column=start_col, end_row=row, end_column=end_col)
+                        start_col = end_col + 1  # Avança para a próxima célula a verificar
+                    else:
+                        break
+
+                wb.save(final_file_path)
+
+                # Remover o arquivo temporário
+                os.remove(temp_file_path)
+
+                return final_file_path
         else:
             raise Exception("Erro ao baixar o arquivo")
     else:
-        raise Exception("Elemento com a classe 'item-6225' não encontrado")
+        raise Exception("Elemento com a nome 'Tabela.xlsx' não encontrado")

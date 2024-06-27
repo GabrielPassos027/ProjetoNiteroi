@@ -195,3 +195,7 @@ def download_caged_data_route():
         return f'Download realizado com sucesso. Arquivo salvo em: {file_path}'
     except Exception as e:
         return f'Erro ao baixar o arquivo: {str(e)}'
+    
+@main.route('/focus')
+def focus():
+    return render_template('focus.html')
