@@ -9,6 +9,7 @@ from app.controllers.anp_controller import fetch_anp_data
 from app.controllers.ibge_controller import fetch_ipca_data, fetch_unemployment_data, download_caged_data
 from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
+from app.controllers.focus_controller import fetch_selic_data, fetch_pib_data, fetch_focus_ipca_data, fetch_focus_cambio_data
 
 main = Blueprint('main', __name__)
 
@@ -199,3 +200,23 @@ def download_caged_data_route():
 @main.route('/focus')
 def focus():
     return render_template('focus.html')
+
+@main.route('/focus/selic')
+def focus_selic():
+    data = fetch_selic_data()
+    return render_template('focus_selic.html', selic_data=data)
+
+@main.route('/focus/ipca')
+def focus_ipca():
+    data = fetch_focus_ipca_data()
+    return render_template('focus_ipca.html', data=data)
+
+@main.route('/focus/cambio')
+def focus_cambio():
+    data = fetch_focus_cambio_data()
+    return render_template('focus_cambio.html', data=data)
+
+@main.route('/focus/pib')
+def focus_pib():
+    data = fetch_pib_data()
+    return render_template('focus_pib.html', pib_data=data)

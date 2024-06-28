@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados SELIC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dados SELIC</h1>
+
+    {% if selic_data %}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Indicador</th>
+                    <th>Data</th>
+                    <th>Mediana</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in selic_data %}
+                <tr>
+                    <td>{{ item.Indicador }}</td>
+                    <td>{{ item.Data }}</td>
+                    <td>{{ item.Mediana }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>Não há dados disponíveis.</p>
+    {% endif %}
+</body>
+</html>
