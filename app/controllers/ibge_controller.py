@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import shutil
 from openpyxl import load_workbook
+from datetime import datetime
 
 
 lista_url = [
@@ -45,7 +46,12 @@ def fetch_unemployment_data():
     url = "https://apisidra.ibge.gov.br/values/t/6381/n1/all/v/4099/p/all/d/v4099%201"
     response = requests.get(url)
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        
+        # Filtrar dados para incluir apenas a partir de 201901
+        filtered_data = [item for item in data if item['D3C'] >= '201901']
+        
+        return filtered_data
     else:
         raise Exception(f"Erro na requisição Desemprego: {response.status_code}")
     
