@@ -43,7 +43,13 @@ def fetch_selic_data():
         final_data = []
         for date in filtered_dates:
             daily_data = filtered_data[filtered_data['Data'] == date]
-            final_data.extend(daily_data.head(4).to_dict('records'))
+            daily_records = daily_data.head(4).to_dict('records')
+            
+            # Adiciona a "Data Referência" para cada grupo de 4 registros
+            for i, record in enumerate(daily_records):
+                record['Data Referência'] = record['Data'].year + i
+            
+            final_data.extend(daily_records)
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
@@ -97,7 +103,13 @@ def fetch_pib_data():
         final_data = []
         for date in filtered_dates:
             daily_data = filtered_data[filtered_data['Data'] == date]
-            final_data.extend(daily_data.iloc[5:9].to_dict('records'))
+            daily_records = daily_data.iloc[5:9].to_dict('records')
+
+            # Adiciona a "Data Referência" para cada grupo de 4 registros
+            for i, record in enumerate(daily_records):
+                record['Data Referência'] = record['Data'].year + i
+
+            final_data.extend(daily_records)
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
@@ -150,7 +162,13 @@ def fetch_focus_ipca_data():
         final_data = []
         for date in filtered_dates:
             daily_data = filtered_data[filtered_data['Data'] == date]
-            final_data.extend(daily_data.iloc[5:9].to_dict('records'))
+            daily_records = daily_data.iloc[5:9].to_dict('records')
+            
+            # Adiciona a "Data Referência" para cada grupo de 4 registros
+            for i, record in enumerate(daily_records):
+                record['Data Referência'] = record['Data'].year + i
+            
+            final_data.extend(daily_records)
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
@@ -203,7 +221,13 @@ def fetch_focus_cambio_data():
         final_data = []
         for date in filtered_dates:
             daily_data = filtered_data[filtered_data['Data'] == date]
-            final_data.extend(daily_data.iloc[5:9].to_dict('records'))
+            daily_records = daily_data.iloc[5:9].to_dict('records')
+
+            # Adiciona a "Data Referência" para cada grupo de 4 registros
+            for i, record in enumerate(daily_records):
+                record['Data Referência'] = record['Data'].year + i
+
+            final_data.extend(daily_records)
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:

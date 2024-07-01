@@ -34,6 +34,7 @@
                     <th>Indicador</th>
                     <th>Data</th>
                     <th>Mediana</th>
+                    <th>Data Referência</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +43,7 @@
                     <td>{{ item.Indicador }}</td>
                     <td>{{ item.Data }}</td>
                     <td>{{ item.Mediana }}</td>
+                    <td>{{ item['Data Referência'] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
