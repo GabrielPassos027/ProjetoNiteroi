@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 from flask import current_app
 import pandas as pd
+from app.models import Focus, db
 
 def fetch_selic_data():
     url_selic = "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?%24format=json&%24filter=Indicador%20eq%20'Selic'"
@@ -241,3 +242,19 @@ def fetch_focus_cambio_data():
     except requests.RequestException as e:
         current_app.logger.error(f"Erro ao obter dados Câmbio: {e}")
         return []
+    
+def save_focus_data(app):
+    with app.app_context():
+        datas = [fetch_focus_ipca_data(), fetch_pib_data(), fetch_focus_cambio_data(), fetch_selic_data()]
+        for func in datas:
+            for item in func:
+                new_entry = Focus(
+                    data=item['Data'],
+                    mediana=item['Mediana'],
+                    indicador=item['Indicador'],
+                    dataRef=item['DataReferencia']
+                )
+                db.session.add(new_entry)
+                db.session.commit()
+                print(f"Dados salvos: {new_entry}")
+

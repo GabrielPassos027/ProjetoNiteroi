@@ -1,6 +1,6 @@
-from app import db
 from datetime import datetime
-import pytz
+from app import db
+
 
 class SiconfiDataRREO(db.Model):
     __tablename__ = 'siconfi_data_RREO'
@@ -32,3 +32,26 @@ class SiconfiDataRGF(db.Model):
 
     def __repr__(self):
         return f"<SiconfiDataRGF id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
+
+class BrentANP(db.Model):
+    __tablename__ = 'Brent_ANP'
+    idANP = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    period = db.Column('Periodo', db.String(45))
+    product = db.Column('Produto', db.String(45))
+    product_name = db.Column('Nome_Produto', db.String(45))
+    value = db.Column('Valor', db.Float)
+    units = db.Column('Unidades', db.String(45))
+
+    def __repr__(self):
+        return f'<BrentANP {self.period} - {self.product_name}>'
+    
+class Focus(db.Model):
+    __tablename__ = 'Focus'
+    idFocus = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    data = db.Column('Data', db.String(45))
+    mediana = db.Column('Mediana', db.Float)
+    indicador = db.Column('Indicador', db.String(45))
+    dataRef = db.Column('DataReferencia', db.String(45))
+
+    def __repr__(self):
+        return f'<Focus {self.indicador} - {self.data} - {self.mediana}>'

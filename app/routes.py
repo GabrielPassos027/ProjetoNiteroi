@@ -11,6 +11,7 @@ from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
 from app.controllers.focus_controller import fetch_selic_data, fetch_pib_data, fetch_focus_ipca_data, fetch_focus_cambio_data
 
+
 main = Blueprint('main', __name__)
 
 @main.route('/')
@@ -220,3 +221,13 @@ def focus_cambio():
 def focus_pib():
     data = fetch_pib_data()
     return render_template('focus_pib.html', pib_data=data)
+
+# from flask import Blueprint, render_template
+# from app.controllers.anp_controller import fetch_anp_data
+
+# main = Blueprint('main', __name__)
+
+# @main.route('/anp')
+# def anp():
+#     data = fetch_anp_data()
+#     return render_template('anp.html', data=data)
