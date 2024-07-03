@@ -7,6 +7,7 @@ import pandas as pd
 import shutil
 from openpyxl import load_workbook
 from datetime import datetime
+from app.models import IPCA_IBGE, Desemprego_IBGE, db
 
 
 lista_url = [
@@ -21,6 +22,26 @@ lista_url = [
     "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63/p/last%205/c315/all/d/v63%202"
 ]
 
+# def fetch_ipca_data():
+#     all_data = []
+#     for url in lista_url:
+#         response = requests.get(url)
+#         if response.status_code == 200:
+#             all_data.extend(response.json())
+#         else:
+#             raise Exception(f"Erro na requisição IPCA: {response.status_code}")
+#         time.sleep(10)  # Pausa de 10 segundos entre as requisições
+
+#     # Filtrar dados para remover linhas indesejadas
+#     filtered_data = [item for item in all_data if item['D4N'] != 'Geral, grupo, subgrupo, item e subitem']
+
+#     # Extrair opções únicas para filtros e ordená-las
+#     variable_options = sorted(list(set(item['D3C'] for item in filtered_data)))
+#     unit_options = sorted(list(set(item['V'] for item in filtered_data)))
+#     value_options = sorted(list(set(item['D4N'] for item in filtered_data)))
+
+#     return filtered_data, variable_options, unit_options, value_options
+
 def fetch_ipca_data():
     all_data = []
     for url in lista_url:
@@ -34,12 +55,7 @@ def fetch_ipca_data():
     # Filtrar dados para remover linhas indesejadas
     filtered_data = [item for item in all_data if item['D4N'] != 'Geral, grupo, subgrupo, item e subitem']
 
-    # Extrair opções únicas para filtros e ordená-las
-    variable_options = sorted(list(set(item['D3C'] for item in filtered_data)))
-    unit_options = sorted(list(set(item['V'] for item in filtered_data)))
-    value_options = sorted(list(set(item['D4N'] for item in filtered_data)))
-
-    return filtered_data, variable_options, unit_options, value_options
+    return filtered_data
 
 
 def fetch_unemployment_data():
@@ -129,3 +145,41 @@ def download_caged_data():
             raise Exception("Erro ao baixar o arquivo")
     else:
         raise Exception("Elemento com a nome 'Tabela.xlsx' não encontrado")
+    
+def save_ipca_ibge_data(app):
+    with app.app_context():
+        IPCA_IBGE.query.delete()
+        db.session.commit()
+        
+        datas = fetch_ipca_data()
+        for item in datas:
+            new_entry = IPCA_IBGE(
+                periodo=item['D3C'],
+                valor=item['V'],
+                itens=item['D4N']
+            )
+            db.session.add(new_entry)
+            print(f"Dados salvos: {new_entry}")
+            db.session.commit()
+
+def save_desemprego_ibge_data(app):
+    with app.app_context():
+        data = fetch_unemployment_data()
+        for item in data:
+            # Verifique se o valor é um número
+            try:
+                valor = float(item['V'])
+            except ValueError:
+                print(f"Valor inválido para o período {item['D3C']}: {item['V']}")
+                continue
+
+            if not Desemprego_IBGE.query.filter_by(data=item['D3C']).first():
+                new_entry = Desemprego_IBGE(
+                    valor=valor,
+                    data=item['D3C']
+                )
+                db.session.add(new_entry)
+                db.session.commit()
+                print(f"Dados salvos: {new_entry}")
+            else:
+                print(f"Dados para o período {item['D3C']} já existem.")

@@ -55,3 +55,22 @@ class Focus(db.Model):
 
     def __repr__(self):
         return f'<Focus {self.indicador} - {self.data} - {self.mediana}>'
+    
+class IPCA_IBGE(db.Model):
+    __tablename__ = 'IPCA_IBGE'
+    idIPCA_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    periodo = db.Column('Periodo', db.String(45))
+    valor = db.Column('Valor', db.Float)
+    itens = db.Column('Item', db.String(100))
+
+    def __repr__(self):
+        return f'<IPCA IBGE {self.periodo} - {self.valor}>'
+    
+class Desemprego_IBGE(db.Model):
+    __tablename__ = 'Desemprego_IBGE'
+    idDesemprego_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    valor = db.Column('Valor', db.Float)
+    data = db.Column('Data', db.String(45))
+
+    def __repr__(self):
+        return f'<IPCA IBGE {self.valor} - {self.data}>'

@@ -245,6 +245,9 @@ def fetch_focus_cambio_data():
     
 def save_focus_data(app):
     with app.app_context():
+        Focus.query.delete()
+        db.session.commit()
+        
         datas = [fetch_focus_ipca_data(), fetch_pib_data(), fetch_focus_cambio_data(), fetch_selic_data()]
         for func in datas:
             for item in func:
