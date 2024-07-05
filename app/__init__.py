@@ -33,7 +33,7 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from app.models import SiconfiDataRREO, SiconfiDataRGF, BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE
+        from app.models import SiconfiDataRREO, SiconfiDataRGF, BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE,RGF_SICONFI,RREO_SICONFI
         db.create_all()
 
         from app.routes import main

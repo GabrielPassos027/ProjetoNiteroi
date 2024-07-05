@@ -74,3 +74,52 @@ class Desemprego_IBGE(db.Model):
 
     def __repr__(self):
         return f'<IPCA IBGE {self.valor} - {self.data}>'
+    
+
+class CAGED_IBGE(db.Model):
+    __tablename__ = 'CAGED_IBGE'
+    idCAGED_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    UF = db.Column('UF', db.String(45))
+    Cod_Municipio = db.Column('Cod_Municipio', db.Integer)  
+    Municipio = db.Column('Municipio', db.String(45))
+    Mes = db.Column('Mes', db.String(45))
+    Estoque = db.Column('Estoque', db.Integer)  
+    Admissoes = db.Column('Admissoes', db.Integer)  
+    Desligamentos = db.Column('Desligamentos', db.Integer)  
+    Saldos = db.Column('Saldos', db.Integer)  
+    Variacao = db.Column('Variacao', db.Float)  
+
+class RGF_SICONFI:
+    __tablename__ = 'RGF_siconfi'
+    idRGF_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    instituicao = db.Column('Instituicao', db.String(45))
+    codIBGE = db.Column('CodIBGE', db.String(45))
+    uf = db.Column('UF', db.String(45))
+    coluna = db.Column('Coluna', db.String(45))
+    conta = db.Column('Conta', db.String(45))
+    idConta = db.Column('IdConta', db.String(100))
+    valor = db.Column('Valor', db.Float) 
+    exercicio = db.Column('Exercicio', db.Integer) 
+    periodo = db.Column('Periodo', db.String(45))
+    anexo = db.Column('Anexo', db.String(45))
+    tabela = db.Column('Tabela', db.String(45))
+
+class RREO_SICONFI:
+    __tablename__ = 'RREO_siconfi'
+    idRREO_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    instituicao = db.Column('Instituicao', db.String(45))
+    codIBGE = db.Column('CodIBGE', db.String(45))
+    uf = db.Column('UF', db.String(45))
+    coluna = db.Column('Coluna', db.String(45))
+    conta = db.Column('Conta', db.String(45))
+    idConta = db.Column('IdConta', db.String(100))
+    valor = db.Column('Valor', db.Float) 
+    exercicio = db.Column('Exercicio', db.Integer) 
+    periodo = db.Column('Periodo', db.String(45))
+    anexo = db.Column('Anexo', db.String(45))
+    tabela = db.Column('Tabela', db.String(45))
+    
+# class CAGED_IBGE(db.Model):
+#     __tablename__ = 'CAGED_IBGE'
+#     idCAGED_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     UF = db.Column('UF', db.String(45))

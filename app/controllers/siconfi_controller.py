@@ -1,4 +1,5 @@
 import requests
+from app.models import RREO_SICONFI, RGF_SICONFI, db
 
 def fetch_siconfi_RREO_data(an_exercicio, nr_periodo, no_anexo):
     url = (f'https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo?'

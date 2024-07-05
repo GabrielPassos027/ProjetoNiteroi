@@ -7,7 +7,8 @@ import pandas as pd
 import shutil
 from openpyxl import load_workbook
 from datetime import datetime
-from app.models import IPCA_IBGE, Desemprego_IBGE, db
+from app.models import IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE, db
+from sqlalchemy.exc import IntegrityError
 
 
 lista_url = [
@@ -72,6 +73,80 @@ def fetch_unemployment_data():
         raise Exception(f"Erro na requisição Desemprego: {response.status_code}")
     
 
+# def download_caged_data():
+#     url = "http://pdet.mte.gov.br/novo-caged"
+#     response = requests.get(url)
+#     soup = BeautifulSoup(response.text, 'html.parser')
+
+#     links = soup.find_all("a", text="3. Tabelas.xlsx")
+#     if links:
+#         file_url = links[0]["href"]
+#         full_file_url = "http://pdet.mte.gov.br" + file_url
+
+#         response = requests.get(full_file_url)
+#         if response.status_code == 200:
+#             desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+#             download_folder = os.path.join(desktop_path, "IBGE-Postos de Trabalho")
+#             os.makedirs(download_folder, exist_ok=True)
+#             temp_file_path = os.path.join(download_folder, "temp_download.xlsx")
+
+#             with open(temp_file_path, "wb") as file:
+#                 file.write(response.content)
+
+#             # Carregar o arquivo Excel usando pandas
+#             xls = pd.ExcelFile(temp_file_path)
+
+#             # Verificar se a aba "Tabela 8.1" existe
+#             if "Tabela 8.1" in xls.sheet_names:
+#                 df = pd.read_excel(xls, sheet_name="Tabela 8.1")
+
+#                 # Corrigir os nomes das colunas removendo "Unnamed" e ajustando a formatação
+#                 df.columns = [col if 'Unnamed' not in col else '' for col in df.columns]
+
+#                 # Salvar a aba específica em um novo arquivo Excel
+#                 final_file_path = os.path.join(download_folder, "Tabela_8_1.xlsx")
+#                 with pd.ExcelWriter(final_file_path, engine='openpyxl') as writer:
+#                     df.to_excel(writer, sheet_name="Tabela 8.1", index=False)
+
+#                 # Fechar o arquivo Excel para liberar o recurso
+#                 xls.close()
+
+#                 # Mesclar as células no arquivo final
+#                 wb = load_workbook(final_file_path)
+#                 ws = wb["Tabela 8.1"]
+
+#                 # Mesclar E5:H5
+#                 ws.merge_cells('E5:H5')
+#                 # Mesclar B5:B6
+#                 ws.merge_cells('B5:B6')
+#                 # Mesclar C5:C6
+#                 ws.merge_cells('C5:C6')
+#                 # Mesclar D5:D6
+#                 ws.merge_cells('D5:D6')
+
+#                 # Lógica para mesclar células a partir de I5 até que não haja mais conteúdo
+#                 start_col = 9  # Coluna I
+#                 row = 5
+
+#                 while True:
+#                     if ws.cell(row=row, column=start_col).value:
+#                         end_col = start_col + 4  # Mescla 5 colunas à direita
+#                         ws.merge_cells(start_row=row, start_column=start_col, end_row=row, end_column=end_col)
+#                         start_col = end_col + 1  # Avança para a próxima célula a verificar
+#                     else:
+#                         break
+
+#                 wb.save(final_file_path)
+
+#                 # Remover o arquivo temporário
+#                 os.remove(temp_file_path)
+
+#                 return final_file_path
+#         else:
+#             raise Exception("Erro ao baixar o arquivo")
+#     else:
+#         raise Exception("Elemento com a nome 'Tabela.xlsx' não encontrado")
+
 def download_caged_data():
     url = "http://pdet.mte.gov.br/novo-caged"
     response = requests.get(url)
@@ -97,54 +172,27 @@ def download_caged_data():
 
             # Verificar se a aba "Tabela 8.1" existe
             if "Tabela 8.1" in xls.sheet_names:
-                df = pd.read_excel(xls, sheet_name="Tabela 8.1")
+                df = pd.read_excel(xls, sheet_name="Tabela 8.1", skiprows=4)  # Excluir as primeiras 4 linhas
 
-                # Corrigir os nomes das colunas removendo "Unnamed" e ajustando a formatação
-                df.columns = [col if 'Unnamed' not in col else '' for col in df.columns]
+                # Remover a primeira coluna (índice 0 em pandas)
+                df = df.iloc[:, 1:]
 
-                # Salvar a aba específica em um novo arquivo Excel
-                final_file_path = os.path.join(download_folder, "Tabela_8_1.xlsx")
-                with pd.ExcelWriter(final_file_path, engine='openpyxl') as writer:
-                    df.to_excel(writer, sheet_name="Tabela 8.1", index=False)
+                # Salvar o DataFrame como CSV
+                final_csv_path = os.path.join(download_folder, "resultado.csv")
+                df.to_csv(final_csv_path, index=False)
 
                 # Fechar o arquivo Excel para liberar o recurso
                 xls.close()
 
-                # Mesclar as células no arquivo final
-                wb = load_workbook(final_file_path)
-                ws = wb["Tabela 8.1"]
-
-                # Mesclar E5:H5
-                ws.merge_cells('E5:H5')
-                # Mesclar B5:B6
-                ws.merge_cells('B5:B6')
-                # Mesclar C5:C6
-                ws.merge_cells('C5:C6')
-                # Mesclar D5:D6
-                ws.merge_cells('D5:D6')
-
-                # Lógica para mesclar células a partir de I5 até que não haja mais conteúdo
-                start_col = 9  # Coluna I
-                row = 5
-
-                while True:
-                    if ws.cell(row=row, column=start_col).value:
-                        end_col = start_col + 4  # Mescla 5 colunas à direita
-                        ws.merge_cells(start_row=row, start_column=start_col, end_row=row, end_column=end_col)
-                        start_col = end_col + 1  # Avança para a próxima célula a verificar
-                    else:
-                        break
-
-                wb.save(final_file_path)
-
                 # Remover o arquivo temporário
                 os.remove(temp_file_path)
 
-                return final_file_path
+                return final_csv_path
         else:
             raise Exception("Erro ao baixar o arquivo")
     else:
         raise Exception("Elemento com a nome 'Tabela.xlsx' não encontrado")
+
     
 def save_ipca_ibge_data(app):
     with app.app_context():
@@ -183,3 +231,72 @@ def save_desemprego_ibge_data(app):
                 print(f"Dados salvos: {new_entry}")
             else:
                 print(f"Dados para o período {item['D3C']} já existem.")
+
+def save_caged_data_to_db(app):
+    # Baixar e processar os dados
+    csv_path = download_caged_data()
+    
+    # Inicializar o contexto do aplicativo
+    with app.app_context():
+        # Carregar o CSV
+        df = pd.read_csv(csv_path)
+        df.columns = df.iloc[0].tolist()
+        df = df[1:]
+        df.rename(
+            columns={
+                df.columns[0]: 'UF',
+                df.columns[1]: 'Código do Município',
+                df.columns[2]: 'Município'
+            }, inplace=True
+        )
+
+        col_aux = {}
+        for nome in df.columns.unique().tolist():
+            col_aux[nome] = 1
+
+        col = []
+        for column in df.columns:
+            for key, value in col_aux.items():
+                if key == column:
+                    col.append(f"{column}_{value}")
+                    col_aux[key] += 1
+        df.columns = col
+        df_auxiliar = pd.DataFrame(df)
+        df_temp = df_auxiliar.iloc[:, 0:7]
+
+        from datetime import datetime
+        from dateutil.relativedelta import relativedelta
+
+        data = datetime(2020, 1, 1)
+        iteracao = 1
+        while len(df_auxiliar.columns) > 12:
+            if iteracao == 1:
+                df_temp['Variação Relativa (%)'] = None
+                df_temp['data_referencia'] = data
+                df_auxiliar.drop(df_auxiliar.iloc[:, 3:7], axis=1, inplace=True)
+            else:
+                df_temp = df_auxiliar.iloc[:, 0:8]
+                df_temp['data_referencia'] = data
+                df_auxiliar.drop(df_auxiliar.iloc[:, 3:8], axis=1, inplace=True)
+            df_temp.to_csv(data.strftime('%m_%Y') + '.csv', index=False)
+            data = data + relativedelta(months=1)
+            iteracao += 1
+
+            # Salvar os dados no banco de dados
+            for index, row in df_temp.iterrows():
+                caged_record = CAGED_IBGE(
+                    UF=row['UF'],
+                    Cod_Municipio=row['Código do Município'],
+                    Municipio=row['Município'],
+                    Mes=row['data_referencia'].strftime('%m_%Y'),
+                    Estoque=row.get('Estoque', None),
+                    Admissoes=row.get('Admissões', None),
+                    Desligamentos=row.get('Desligamentos', None),
+                    Saldos=row.get('Saldo', None),
+                    Variacao=row.get('Variação Relativa (%)', None)
+                )
+                db.session.add(caged_record)
+            db.session.commit()
+    
+
+        
