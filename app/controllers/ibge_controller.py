@@ -280,23 +280,34 @@ def save_caged_data_to_db(app):
                 df_auxiliar.drop(df_auxiliar.iloc[:, 3:8], axis=1, inplace=True)
             df_temp.to_csv(data.strftime('%m_%Y') + '.csv', index=False)
             data = data + relativedelta(months=1)
-            iteracao += 1
+            
 
+            df_temp = df_temp.replace(['---', 'NaN', 'nan', pd.NaT, None], {'Estoque_1': 0, 'Admissões_1': 0, 'Desligamentos_1': 0, 'Saldos_1': 0, 'Variação Relativa (%)': 0.0})
+            df_temp['Código do Município_1'] = pd.to_numeric(df_temp['Código do Município_1'], errors= 'coerce').fillna(0).astype(int)
+            df_temp['Estoque_1'] = pd.to_numeric(df_temp['Estoque_1'], errors='coerce').fillna(0).astype(int)
+            df_temp['Admissões_1'] = pd.to_numeric(df_temp['Admissões_1'], errors='coerce').fillna(0).astype(int)
+            df_temp['Desligamentos_1'] = pd.to_numeric(df_temp['Desligamentos_1'], errors='coerce').fillna(0).astype(int)
+            df_temp['Saldos_1'] = pd.to_numeric(df_temp['Saldos_1'], errors='coerce').fillna(0).astype(int)
+            df_temp['Variação Relativa (%)'] = pd.to_numeric(df_temp['Variação Relativa (%)'], errors='coerce').fillna(0.0).astype(float)
+            
             # Salvar os dados no banco de dados
             for index, row in df_temp.iterrows():
                 caged_record = CAGED_IBGE(
-                    UF=row['UF'],
-                    Cod_Municipio=row['Código do Município'],
-                    Municipio=row['Município'],
+                    UF=row['Município_1'],
+                    Cod_Municipio=row[f'Código do Município_1'],
+                    Municipio=row['Município_2'],
                     Mes=row['data_referencia'].strftime('%m_%Y'),
-                    Estoque=row.get('Estoque', None),
-                    Admissoes=row.get('Admissões', None),
-                    Desligamentos=row.get('Desligamentos', None),
-                    Saldos=row.get('Saldo', None),
+                    Estoque=row.get('Estoque_1', None),
+                    Admissoes=row.get('Admissões_1', None),
+                    Desligamentos=row.get('Desligamentos_1', None),
+                    Saldos=row.get('Saldos_1', None),
                     Variacao=row.get('Variação Relativa (%)', None)
                 )
                 db.session.add(caged_record)
+
+            
             db.session.commit()
+            iteracao += 1
     
 
         

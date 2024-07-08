@@ -79,7 +79,7 @@ class Desemprego_IBGE(db.Model):
 class CAGED_IBGE(db.Model):
     __tablename__ = 'CAGED_IBGE'
     idCAGED_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    UF = db.Column('UF', db.String(45))
+    UF = db.Column('UF', db.String(255))
     Cod_Municipio = db.Column('Cod_Municipio', db.Integer)  
     Municipio = db.Column('Municipio', db.String(45))
     Mes = db.Column('Mes', db.String(45))
