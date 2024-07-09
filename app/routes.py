@@ -161,6 +161,8 @@ def upload_siconfi():
             
             try:
                 file.save(file_path)
+                from app.controllers.siconfi_controller import save_siconfi_data_to_db
+                save_siconfi_data_to_db(current_app, file_path)
                 return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
             except Exception as e:
                 return f"Erro ao salvar o arquivo: {e}", 500
@@ -221,13 +223,3 @@ def focus_cambio():
 def focus_pib():
     data = fetch_pib_data()
     return render_template('focus_pib.html', pib_data=data)
-
-# from flask import Blueprint, render_template
-# from app.controllers.anp_controller import fetch_anp_data
-
-# main = Blueprint('main', __name__)
-
-# @main.route('/anp')
-# def anp():
-#     data = fetch_anp_data()
-#     return render_template('anp.html', data=data)

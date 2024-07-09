@@ -89,7 +89,7 @@ class CAGED_IBGE(db.Model):
     Saldos = db.Column('Saldos', db.Integer)  
     Variacao = db.Column('Variacao', db.Float)  
 
-class RGF_SICONFI:
+class RGF_SICONFI(db.Model):
     __tablename__ = 'RGF_siconfi'
     idRGF_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
     instituicao = db.Column('Instituicao', db.String(45))
@@ -104,14 +104,14 @@ class RGF_SICONFI:
     anexo = db.Column('Anexo', db.String(45))
     tabela = db.Column('Tabela', db.String(45))
 
-class RREO_SICONFI:
+class RREO_SICONFI(db.Model):
     __tablename__ = 'RREO_siconfi'
     idRREO_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
     instituicao = db.Column('Instituicao', db.String(45))
     codIBGE = db.Column('CodIBGE', db.String(45))
     uf = db.Column('UF', db.String(45))
     coluna = db.Column('Coluna', db.String(45))
-    conta = db.Column('Conta', db.String(45))
+    conta = db.Column('Conta', db.String(100))
     idConta = db.Column('IdConta', db.String(100))
     valor = db.Column('Valor', db.Float) 
     exercicio = db.Column('Exercicio', db.Integer) 
