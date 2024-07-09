@@ -55,3 +55,4 @@ def fetch_siconfi_RGF_data(an_exercicio, nr_periodo):
         return resultados_filtrados
     else:
         return []
+

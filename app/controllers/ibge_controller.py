@@ -239,6 +239,9 @@ def save_caged_data_to_db(app):
     # Inicializar o contexto do aplicativo
     with app.app_context():
         # Carregar o CSV
+        CAGED_IBGE.query.delete()
+        db.session.commit()
+
         df = pd.read_csv(csv_path)
         df.columns = df.iloc[0].tolist()
         df = df[1:]
@@ -278,17 +281,17 @@ def save_caged_data_to_db(app):
                 df_temp = df_auxiliar.iloc[:, 0:8]
                 df_temp['data_referencia'] = data
                 df_auxiliar.drop(df_auxiliar.iloc[:, 3:8], axis=1, inplace=True)
-            df_temp.to_csv(data.strftime('%m_%Y') + '.csv', index=False)
+            # df_temp.to_csv(data.strftime('%m_%Y') + '.csv', index=False)
             data = data + relativedelta(months=1)
             
-
-            df_temp = df_temp.replace(['---', 'NaN', 'nan', pd.NaT, None], {'Estoque_1': 0, 'Admissões_1': 0, 'Desligamentos_1': 0, 'Saldos_1': 0, 'Variação Relativa (%)': 0.0})
+            list_aux = df_temp.columns.to_list()
+            df_temp = df_temp.replace(['---', 'NaN', 'nan', pd.NaT, None], {list_aux[3]: 0, list_aux[4]: 0, list_aux[5]: 0, list_aux[6]: 0, list_aux[7]: 0.0})
             df_temp['Código do Município_1'] = pd.to_numeric(df_temp['Código do Município_1'], errors= 'coerce').fillna(0).astype(int)
-            df_temp['Estoque_1'] = pd.to_numeric(df_temp['Estoque_1'], errors='coerce').fillna(0).astype(int)
-            df_temp['Admissões_1'] = pd.to_numeric(df_temp['Admissões_1'], errors='coerce').fillna(0).astype(int)
-            df_temp['Desligamentos_1'] = pd.to_numeric(df_temp['Desligamentos_1'], errors='coerce').fillna(0).astype(int)
-            df_temp['Saldos_1'] = pd.to_numeric(df_temp['Saldos_1'], errors='coerce').fillna(0).astype(int)
-            df_temp['Variação Relativa (%)'] = pd.to_numeric(df_temp['Variação Relativa (%)'], errors='coerce').fillna(0.0).astype(float)
+            df_temp[list_aux[3]] = pd.to_numeric(df_temp[list_aux[3]], errors='coerce').fillna(0).astype(int)
+            df_temp[list_aux[4]] = pd.to_numeric(df_temp[list_aux[4]], errors='coerce').fillna(0).astype(int)
+            df_temp[list_aux[5]] = pd.to_numeric(df_temp[list_aux[5]], errors='coerce').fillna(0).astype(int)
+            df_temp[list_aux[6]] = pd.to_numeric(df_temp[list_aux[6]], errors='coerce').fillna(0).astype(int)
+            df_temp[list_aux[7]] = pd.to_numeric(df_temp[list_aux[7]], errors='coerce').fillna(0.0).astype(float)
             
             # Salvar os dados no banco de dados
             for index, row in df_temp.iterrows():
@@ -297,14 +300,14 @@ def save_caged_data_to_db(app):
                     Cod_Municipio=row[f'Código do Município_1'],
                     Municipio=row['Município_2'],
                     Mes=row['data_referencia'].strftime('%m_%Y'),
-                    Estoque=row.get('Estoque_1', None),
-                    Admissoes=row.get('Admissões_1', None),
-                    Desligamentos=row.get('Desligamentos_1', None),
-                    Saldos=row.get('Saldos_1', None),
-                    Variacao=row.get('Variação Relativa (%)', None)
+                    Estoque=row.get(list_aux[3], None),
+                    Admissoes=row.get(list_aux[4], None),
+                    Desligamentos=row.get(list_aux[5], None),
+                    Saldos=row.get(list_aux[6], None),
+                    Variacao=row.get(list_aux[7], None)
                 )
                 db.session.add(caged_record)
-
+                print(f"Dados salvos: {caged_record.UF}, {caged_record.Municipio}, {caged_record.Mes}")
             
             db.session.commit()
             iteracao += 1
