@@ -119,7 +119,3 @@ class RREO_SICONFI:
     anexo = db.Column('Anexo', db.String(45))
     tabela = db.Column('Tabela', db.String(45))
     
-# class CAGED_IBGE(db.Model):
-#     __tablename__ = 'CAGED_IBGE'
-#     idCAGED_IBGE = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     UF = db.Column('UF', db.String(45))
