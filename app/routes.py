@@ -10,13 +10,54 @@ from app.controllers.ibge_controller import fetch_ipca_data, fetch_unemployment_
 from app.utils.web_scraper import download_next_focus_report, convert_all_pdfs
 from werkzeug.utils import secure_filename
 from app.controllers.focus_controller import fetch_selic_data, fetch_pib_data, fetch_focus_ipca_data, fetch_focus_cambio_data
+from flask_login import login_required
 
 
 main = Blueprint('main', __name__)
 
-@main.route('/')
-def index():
-    return render_template('index.html')
+@main.route('/', methods=['GET', 'POST'])
+@login_required
+def upload_siconfi():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return 'Nenhum arquivo selecionado', 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return 'Nenhum arquivo selecionado', 400
+        
+        if file:
+            # Salva o arquivo no diretório da área de trabalho do usuário atual
+            filename = secure_filename(file.filename)
+            desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+            
+            # Determine o diretório de upload com base no nome do arquivo
+            if "finbraRREO" in filename:
+                upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
+            elif "finbraRGF" in filename:
+                upload_folder = os.path.join(desktop_path, 'uploads', 'rgf')
+            else:
+                return 'Nome de arquivo não reconhecido', 400
+            
+            # Cria o diretório se não existir
+            if not os.path.exists(upload_folder):
+                try:
+                    os.makedirs(upload_folder)
+                except Exception as e:
+                    return f"Erro ao criar o diretório: {e}", 500
+            
+            file_path = os.path.join(upload_folder, filename)
+            
+            try:
+                file.save(file_path)
+                from app.controllers.siconfi_controller import save_siconfi_data_to_db
+                save_siconfi_data_to_db(current_app, file_path)
+                return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
+            except Exception as e:
+                return f"Erro ao salvar o arquivo: {e}", 500
+    
+    return render_template('upload_siconfi.html')
 
 @main.route('/siconfi_bases')
 def siconfi_bases():
@@ -126,48 +167,6 @@ def anp():
     data = fetch_anp_data()
     return render_template('anp.html', data=data) 
 
-@main.route('/upload_siconfi', methods=['GET', 'POST'])
-def upload_siconfi():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return 'Nenhum arquivo selecionado', 400
-        
-        file = request.files['file']
-        
-        if file.filename == '':
-            return 'Nenhum arquivo selecionado', 400
-        
-        if file:
-            # Salva o arquivo no diretório da área de trabalho do usuário atual
-            filename = secure_filename(file.filename)
-            desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-            
-            # Determine o diretório de upload com base no nome do arquivo
-            if "finbraRREO" in filename:
-                upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
-            elif "finbraRGF" in filename:
-                upload_folder = os.path.join(desktop_path, 'uploads', 'rgf')
-            else:
-                return 'Nome de arquivo não reconhecido', 400
-            
-            # Cria o diretório se não existir
-            if not os.path.exists(upload_folder):
-                try:
-                    os.makedirs(upload_folder)
-                except Exception as e:
-                    return f"Erro ao criar o diretório: {e}", 500
-            
-            file_path = os.path.join(upload_folder, filename)
-            
-            try:
-                file.save(file_path)
-                from app.controllers.siconfi_controller import save_siconfi_data_to_db
-                save_siconfi_data_to_db(current_app, file_path)
-                return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
-            except Exception as e:
-                return f"Erro ao salvar o arquivo: {e}", 500
-    
-    return render_template('upload_siconfi.html')
 
 @main.route('/ibge')
 def ibge():

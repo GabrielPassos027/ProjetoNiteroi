@@ -1,6 +1,6 @@
 from datetime import datetime
 from app import db
-
+from flask_login import UserMixin
 
 class SiconfiDataRREO(db.Model):
     __tablename__ = 'siconfi_data_RREO'
@@ -119,3 +119,19 @@ class RREO_SICONFI(db.Model):
     anexo = db.Column('Anexo', db.String(45))
     tabela = db.Column('Tabela', db.String(45))
     
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+    def get_id(self):
+        return str(self.id)  # Converte o ID para string, se necessário
+
+    def is_active(self):
+        return self.active
+
+    def is_authenticated(self):
+        return True  # Ou adicione a lógica para verificar se o usuário está autenticado
+
+    def is_anonymous(self):
+        return False
