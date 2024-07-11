@@ -307,8 +307,7 @@ def save_caged_data_to_db(app):
                     Variacao=row.get(list_aux[7], None)
                 )
                 db.session.add(caged_record)
-                print(f"Dados salvos: {caged_record.UF}, {caged_record.Municipio}, {caged_record.Mes}")
-            
+            print(f"Dados do Mês {caged_record.Mes} inserido")
             db.session.commit()
             iteracao += 1
     

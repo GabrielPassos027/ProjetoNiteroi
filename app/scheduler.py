@@ -19,7 +19,7 @@ def start_scheduler(app):
     scheduler.add_job(func=lambda: save_caged_data_to_db(app), trigger="cron", day=5, hour=0, minute=0)
     
     
-    # scheduler.add_job(func=lambda: save_caged_data_to_db(app), trigger="interval", minutes=1)
+    #scheduler.add_job(func=lambda: save_caged_data_to_db(app), trigger="interval", minutes=1)
      
     print("Jobs iniciadas com sucesso!")
     scheduler.start()
