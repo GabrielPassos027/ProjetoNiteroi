@@ -32,7 +32,7 @@ login_manager = LoginManager()
 
 @login_manager.user_loader
 def load_user(user_id):
-    from app.models import User  # Importe dentro da função para evitar importação circular
+    from app.models import User  
     return User.query.get(int(user_id))
 
 def create_app():
@@ -45,7 +45,7 @@ def create_app():
     app.secret_key = 'abcdefgh12345678'
 
     with app.app_context():
-        from app.models import SiconfiDataRREO, SiconfiDataRGF, BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE,RGF_SICONFI,RREO_SICONFI, User
+        from app.models import BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE,RGF_SICONFI,RREO_SICONFI, User
         db.create_all()
 
         if not User.query.filter_by(username='Niteroi').first():

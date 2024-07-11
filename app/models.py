@@ -2,36 +2,36 @@ from datetime import datetime
 from app import db
 from flask_login import UserMixin
 
-class SiconfiDataRREO(db.Model):
-    __tablename__ = 'siconfi_data_RREO'
+# class SiconfiDataRREO(db.Model):
+#     __tablename__ = 'siconfi_data_RREO'
 
-    id = db.Column(db.Integer, primary_key=True)
-    conta = db.Column(db.String(255))
-    cod_conta = db.Column(db.String(255))
-    coluna = db.Column(db.String(255))
-    valor = db.Column(db.Float)
-    exercicio = db.Column(db.Integer)
-    instituicao = db.Column(db.String(255))
-    data_busca = db.Column(db.DateTime, default=datetime.utcnow)
+#     id = db.Column(db.Integer, primary_key=True)
+#     conta = db.Column(db.String(255))
+#     cod_conta = db.Column(db.String(255))
+#     coluna = db.Column(db.String(255))
+#     valor = db.Column(db.Float)
+#     exercicio = db.Column(db.Integer)
+#     instituicao = db.Column(db.String(255))
+#     data_busca = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<SiconfiDataRREO id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
+#     def __repr__(self):
+#         return f"<SiconfiDataRREO id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
 
-class SiconfiDataRGF(db.Model):
-    __tablename__ = 'siconfi_data_RGF'
+# class SiconfiDataRGF(db.Model):
+#     __tablename__ = 'siconfi_data_RGF'
 
-    id = db.Column(db.Integer, primary_key=True)
-    conta = db.Column(db.String(255))
-    cod_conta = db.Column(db.String(255))
-    coluna = db.Column(db.String(255))
-    valor = db.Column(db.Float)
-    cod_ibge = db.Column(db.Integer)
-    populacao = db.Column(db.Integer)
-    instituicao = db.Column(db.String(255))
-    data_busca = db.Column(db.DateTime, default=datetime.utcnow)
+#     id = db.Column(db.Integer, primary_key=True)
+#     conta = db.Column(db.String(255))
+#     cod_conta = db.Column(db.String(255))
+#     coluna = db.Column(db.String(255))
+#     valor = db.Column(db.Float)
+#     cod_ibge = db.Column(db.Integer)
+#     populacao = db.Column(db.Integer)
+#     instituicao = db.Column(db.String(255))
+#     data_busca = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __repr__(self):
-        return f"<SiconfiDataRGF id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
+#     def __repr__(self):
+#         return f"<SiconfiDataRGF id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
 
 class BrentANP(db.Model):
     __tablename__ = 'Brent_ANP'
