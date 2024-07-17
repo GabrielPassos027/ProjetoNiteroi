@@ -54,10 +54,10 @@ def fetch_selic_data():
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
-            entry['Data'] = entry['Data'].strftime('%Y-%m-%d')
+            entry['Data'] = entry['Data'].strftime('%d-%m-%Y')
 
         # Ordena os dados pela data em ordem decrescente
-        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=True)
+        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=False)
 
         return final_data
 
@@ -114,10 +114,10 @@ def fetch_pib_data():
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
-            entry['Data'] = entry['Data'].strftime('%Y-%m-%d')
+            entry['Data'] = entry['Data'].strftime('%d-%m-%Y')
 
         # Ordena os dados pela data em ordem decrescente
-        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=True)
+        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=False)
 
         return final_data
     except requests.RequestException as e:
@@ -173,10 +173,10 @@ def fetch_focus_ipca_data():
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
-            entry['Data'] = entry['Data'].strftime('%Y-%m-%d')
+            entry['Data'] = entry['Data'].strftime('%d-%m-%Y')
 
         # Ordena os dados pela data em ordem decrescente
-        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=True)
+        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=False)
 
         return final_data
     except requests.RequestException as e:
@@ -232,10 +232,10 @@ def fetch_focus_cambio_data():
 
         # Formata a coluna 'Data' para remover a hora
         for entry in final_data:
-            entry['Data'] = entry['Data'].strftime('%Y-%m-%d')
+            entry['Data'] = entry['Data'].strftime('%d-%m-%Y')
 
         # Ordena os dados pela data em ordem decrescente
-        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=True)
+        final_data = sorted(final_data, key=lambda x: x['Data'], reverse=False)
 
         return final_data
 
