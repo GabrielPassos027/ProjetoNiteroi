@@ -101,7 +101,7 @@ def save_siconfi_data_to_db(app, file_path):
                     tabela=row['Tabela']
                 )
                 db.session.add(rreo_record)
-                print(f"Dados salvos: {rreo_record.uf}, {rreo_record.exercicio}, {rreo_record.anexo}, {rreo_record.idConta}")
+            print("Dados RREO salvos")
             db.session.commit()
         
         elif 'rgf' in file_path:
@@ -120,5 +120,5 @@ def save_siconfi_data_to_db(app, file_path):
                     tabela=row['Tabela']
                 )
                 db.session.add(rgf_record)
-                print(f"Dados salvos: {rgf_record.uf}, {rgf_record.exercicio}, {rgf_record.anexo}, {rgf_record.idConta}")
+                print("Dados RGF salvos")
             db.session.commit()
