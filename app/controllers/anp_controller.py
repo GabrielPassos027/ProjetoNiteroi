@@ -56,9 +56,13 @@ def save_anp_data(app):
     with app.app_context():
         data = fetch_anp_data()
         for item in data:
-            if not BrentANP.query.filter_by(period=item['period']).first():
+            # Transformar o período de 'YYYY-MM' para 'MM-YYYY'
+            original_period = item['period']
+            transformed_period = f"{original_period[5:]}-{original_period[:4]}"
+            
+            if not BrentANP.query.filter_by(period=transformed_period).first():
                 new_entry = BrentANP(
-                    period=item['period'],
+                    period=transformed_period,
                     product=item['product'],
                     product_name=item['product-name'],
                     value=item['value'],
@@ -68,5 +72,6 @@ def save_anp_data(app):
                 db.session.commit()
                 print(f"Dados salvos: {new_entry}")
             else:
-                print(f"Dados para o período {item['period']} já existem.")
+                print(f"Dados para o período {transformed_period} já existem.")
+
 
