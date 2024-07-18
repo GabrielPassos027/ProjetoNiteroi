@@ -58,7 +58,7 @@ def fetch_siconfi_RGF_data(an_exercicio, nr_periodo):
     else:
         return []
 
-def save_siconfi_data_to_db(app, file_path):
+def save_rreo_data_to_db(app, file_path):
     # Inicializar o contexto do aplicativo
     with app.app_context():
         # Carregar o CSV
@@ -84,41 +84,65 @@ def save_siconfi_data_to_db(app, file_path):
         df = df.replace({np.nan: None})
         df['Valor'] = df['Valor'].str.replace('.', '').str.replace(',', '.').astype(float)
 
-        if 'rreo' in file_path:
-            # Salvar os dados no banco de dados
-            for index, row in df.iterrows():
-                rreo_record = RREO_SICONFI(
-                    instituicao=row['Instituição'],
-                    codIBGE=row['Cod.IBGE'],
-                    uf=row['UF'],
-                    coluna=row['Coluna'],
-                    conta=row['Conta'],
-                    idConta=row['Identificador da Conta'],
-                    valor=row['Valor'],
-                    exercicio=row['Exercicio'],
-                    periodo=row['Periodo'],
-                    anexo=row['Anexo'],
-                    tabela=row['Tabela']
-                )
-                db.session.add(rreo_record)
-            print("Dados RREO salvos")
-            db.session.commit()
+        # Salvar os dados no banco de dados
+        for index, row in df.iterrows():
+            rreo_record = RREO_SICONFI(
+                instituicao=row['Instituição'],
+                codIBGE=row['Cod.IBGE'],
+                uf=row['UF'],
+                coluna=row['Coluna'],
+                conta=row['Conta'],
+                idConta=row['Identificador da Conta'],
+                valor=row['Valor'],
+                exercicio=row['Exercicio'],
+                periodo=row['Periodo'],
+                anexo=row['Anexo'],
+                tabela=row['Tabela']
+            )
+            db.session.add(rreo_record)
+        db.session.commit()
+        print("Dados RREO salvos")
         
-        elif 'rgf' in file_path:
-            for index, row in df.iterrows():
-                rgf_record = RGF_SICONFI(
-                    instituicao=row['Instituição'],
-                    codIBGE=row['Cod.IBGE'],
-                    uf=row['UF'],
-                    coluna=row['Coluna'],
-                    conta=row['Conta'],
-                    idConta=row['Identificador da Conta'],
-                    valor=row['Valor'],
-                    exercicio=row['Exercicio'],
-                    periodo=row['Periodo'],
-                    anexo=row['Anexo'],
-                    tabela=row['Tabela']
-                )
-                db.session.add(rgf_record)
-                print("Dados RGF salvos")
-            db.session.commit()
+
+def save_rgf_data_to_db(app, file_path):
+    with app.app_context():
+        # Carregar o CSV
+        lista = ["a", "b", "c", "d", "e", "f", "g", "h","i"]
+        df = pd.read_csv(file_path, names=lista, sep=';', encoding='latin-1')
+        
+        # Extração das informações
+        exercicio = df.loc[0]['a'].replace('Exercício: ', '')
+        periodo = df.loc[1]['a'].replace('Período: ', '')
+        anexo = df.loc[3]['a']
+        tabela = df.loc[4]['a'].replace('Tabela: ', '')
+
+        # Ajuste do DataFrame
+        df = df.iloc[5:]
+        df.columns = df.iloc[0].tolist()
+        df = df[1:]
+        df['Exercicio'] = exercicio
+        df['Periodo'] = periodo
+        df['Anexo'] = anexo
+        df['Tabela'] = tabela
+        
+        # Substituir valores inválidos por None
+        df = df.replace({np.nan: None})
+        df['Valor'] = df['Valor'].str.replace('.', '').str.replace(',', '.').astype(float)
+
+        for index, row in df.iterrows():
+            rgf_record = RGF_SICONFI(
+                instituicao=row['Instituição'],
+                codIBGE=row['Cod.IBGE'],
+                uf=row['UF'],
+                coluna=row['Coluna'],
+                conta=row['Conta'],
+                idConta=row['Identificador da Conta'],
+                valor=row['Valor'],
+                exercicio=row['Exercicio'],
+                periodo=row['Periodo'],
+                anexo=row['Anexo'],
+                tabela=row['Tabela']
+            )
+            db.session.add(rgf_record)
+        db.session.commit()
+        print("Dados RGF salvos")

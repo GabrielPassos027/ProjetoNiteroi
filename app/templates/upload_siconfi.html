@@ -67,6 +67,15 @@
             background-color: #f2dede;
             color: #a94442;
         }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #8cb6e4;
+            color: white;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +87,7 @@
         <button type="submit">Upload</button>
     </form>
 
+    <div id="loadingMessage" class="loading">Aguarde, carregando planilha...</div>
     <div id="message" class="message"></div>
 
     <script>
@@ -86,11 +96,17 @@
 
             var formData = new FormData(this);
             var xhr = new XMLHttpRequest();
+            var loadingMessage = document.getElementById('loadingMessage');
+            var messageDiv = document.getElementById('message');
+
+            // Mostrar o pop-up azul
+            loadingMessage.style.display = 'block';
+            messageDiv.style.display = 'none';
 
             xhr.open('POST', '{{ url_for("main.upload_siconfi") }}', true);
 
             xhr.onload = function() {
-                var messageDiv = document.getElementById('message');
+                loadingMessage.style.display = 'none';  // Ocultar o pop-up azul
                 if (xhr.status === 200) {
                     messageDiv.textContent = xhr.responseText;
                     messageDiv.className = 'message success';

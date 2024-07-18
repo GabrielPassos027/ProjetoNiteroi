@@ -51,8 +51,12 @@ def upload_siconfi():
             
             try:
                 file.save(file_path)
-                from app.controllers.siconfi_controller import save_siconfi_data_to_db
-                save_siconfi_data_to_db(current_app, file_path)
+                if 'rreo' in file_path: 
+                    from app.controllers.siconfi_controller import save_rreo_data_to_db
+                    save_rreo_data_to_db(current_app, file_path)
+                elif 'rgf' in file_path:
+                   from app.controllers.siconfi_controller import save_rgf_data_to_db
+                   save_rgf_data_to_db(current_app, file_path)
                 return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
             except Exception as e:
                 return f"Erro ao salvar o arquivo: {e}", 500
