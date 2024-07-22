@@ -2,36 +2,41 @@ from datetime import datetime
 from app import db
 from flask_login import UserMixin
 
-# class SiconfiDataRREO(db.Model):
-#     __tablename__ = 'siconfi_data_RREO'
+class SiconfiDataRREO(db.Model):
+    __tablename__ = 'siconfi_data_RREO'
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     conta = db.Column(db.String(255))
-#     cod_conta = db.Column(db.String(255))
-#     coluna = db.Column(db.String(255))
-#     valor = db.Column(db.Float)
-#     exercicio = db.Column(db.Integer)
-#     instituicao = db.Column(db.String(255))
-#     data_busca = db.Column(db.DateTime, default=datetime.utcnow)
+    idRREO_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    instituicao = db.Column('Instituicao', db.String(255))
+    codIBGE = db.Column('CodIBGE', db.String(45))
+    uf = db.Column('UF', db.String(45))
+    coluna = db.Column('Coluna', db.String(255))
+    conta = db.Column('Conta', db.String(255))
+    idConta = db.Column('IdConta', db.String(100))
+    valor = db.Column('Valor', db.Float) 
+    exercicio = db.Column('Exercicio', db.Integer) 
+    periodo = db.Column('Periodo', db.String(45))
+    anexo = db.Column('Anexo', db.String(255))
+    # tabela = db.Column('Tabela', db.String(255))
+    data_busca = db.Column(db.DateTime, default=datetime.utcnow)
 
-#     def __repr__(self):
-#         return f"<SiconfiDataRREO id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
 
-# class SiconfiDataRGF(db.Model):
-#     __tablename__ = 'siconfi_data_RGF'
+class SiconfiDataRGF(db.Model):
+    __tablename__ = 'siconfi_data_RGF'
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     conta = db.Column(db.String(255))
-#     cod_conta = db.Column(db.String(255))
-#     coluna = db.Column(db.String(255))
-#     valor = db.Column(db.Float)
-#     cod_ibge = db.Column(db.Integer)
-#     populacao = db.Column(db.Integer)
-#     instituicao = db.Column(db.String(255))
-#     data_busca = db.Column(db.DateTime, default=datetime.utcnow)
+    idRGF_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    instituicao = db.Column('Instituicao', db.String(255))
+    codIBGE = db.Column('CodIBGE', db.String(45))
+    uf = db.Column('UF', db.String(45))
+    coluna = db.Column('Coluna', db.String(255))
+    conta = db.Column('Conta', db.String(255))
+    idConta = db.Column('IdConta', db.String(100))
+    valor = db.Column('Valor', db.Float) 
+    exercicio = db.Column('Exercicio', db.Integer) 
+    periodo = db.Column('Periodo', db.String(45))
+    anexo = db.Column('Anexo', db.String(255))
+    # tabela = db.Column('Tabela', db.String(255))
+    data_busca = db.Column(db.DateTime, default=datetime.utcnow)
 
-#     def __repr__(self):
-#         return f"<SiconfiDataRGF id={self.id}, conta={self.conta}, coluna={self.coluna}, valor={self.valor}>"
 
 class BrentANP(db.Model):
     __tablename__ = 'Brent_ANP'
@@ -118,6 +123,7 @@ class RREO_SICONFI(db.Model):
     periodo = db.Column('Periodo', db.String(45))
     anexo = db.Column('Anexo', db.String(255))
     tabela = db.Column('Tabela', db.String(255))
+
     
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
