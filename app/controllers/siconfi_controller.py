@@ -30,7 +30,7 @@ def fetch_ente():
     if response.status_code == 200:
         data = response.json()
         municipios_rio = [
-            "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios",
+            "Niterói", "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios",
             "Arraial do Cabo", "Barra do Piraí", "Barra Mansa", "Belford Roxo", "Bom Jardim",
             "Bom Jesus do Itabapoana", "Cabo Frio", "Cachoeiras de Macacu", "Cambuci", 
             "Campos dos Goytacazes", "Paraty", "Paty do Alferes", "Petrópolis", "Pinheiral", 
@@ -121,8 +121,6 @@ def fetch_siconfi_RREO_data(app):
                                                 anexo=item.get('anexo')
                                             )
                                             db.session.add(new_entry)
-                                            db.session.commit()
-                                            # logger.info(f"Registro salvo: {new_entry}")
                                             total_entries += 1
                                         # else:
                                         #     logger.info(f"Dado já inserido para {item.get('instituicao')} no período {nr_periodo}")
@@ -133,9 +131,12 @@ def fetch_siconfi_RREO_data(app):
                             except Exception as e:
                                 logger.error(f"Erro ao salvar os dados no banco de dados: {str(e)}")
                             time.sleep(3)
+                    db.session.commit()
+                    logger.info(f"Dados RREO salvos para o período {nr_periodo}. Total de entradas adicionadas: {total_entries}")
             logger.info(f"Dados RREO salvos. Total de entradas adicionadas: {total_entries}")
         else:
             logger.error("Nenhum ente encontrado.")
+
 
 
 
