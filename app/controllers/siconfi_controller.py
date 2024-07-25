@@ -312,6 +312,9 @@ def fetch_siconfi_RGF_data(app):
 #         db.session.commit()
 #         print("Dados RREO salvos no banco de dados")
 
+
+
+
 def save_rreo_data_to_db(app, file_path):
     # Inicializar o contexto do aplicativo
     with app.app_context():
@@ -408,6 +411,35 @@ def save_rreo_data_to_db(app, file_path):
             db.session.add(rreo_record)
         db.session.commit()
         print("Dados RREO salvos no banco de dados")
+
+# def save_rreo_data_to_db(app, file_path):
+#     # Inicializar o contexto do aplicativo
+#     with app.app_context():
+#         # Carregar o CSV diretamente
+#         df = pd.read_csv(file_path, sep=';', encoding='latin-1')
+
+#         # Substituir valores inválidos por None
+#         df = df.replace({pd.NA: None, pd.NaT: None})
+
+#         # Salvar os dados no banco de dados
+#         for index, row in df.iterrows():
+#             rreo_record = RREO_SICONFI(
+#                 instituicao=row.get('Instituição'),
+#                 codIBGE=row.get('Cod.IBGE'),
+#                 uf=row.get('UF'),
+#                 coluna=row.get('Coluna'),
+#                 conta=row.get('Conta'),
+#                 idConta=row.get('Identificador da Conta'),
+#                 valor=row.get('Valor'),
+#                 exercicio=row.get('Exercicio'),
+#                 periodo=row.get('Periodo'),
+#                 anexo=row.get('Anexo'),
+#                 tabela=row.get('Tabela')
+#             )
+#             db.session.add(rreo_record)
+        
+#         db.session.commit()
+#         print("Dados RREO salvos no banco de dados")
         
 
 def save_rgf_data_to_db(app, file_path):
