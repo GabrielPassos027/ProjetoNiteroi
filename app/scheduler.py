@@ -21,7 +21,7 @@ def start_scheduler(app):
     
     
     
-    scheduler.add_job(func=lambda: fetch_siconfi_RREO_data(app), trigger="interval", minutes=1)
+    #scheduler.add_job(func=lambda: fetch_siconfi_RREO_data(app), trigger="interval", minutes=1)
      
     print("Jobs iniciadas com sucesso!")
     scheduler.start()
