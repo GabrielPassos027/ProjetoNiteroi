@@ -131,7 +131,7 @@ def fetch_siconfi_RREO_data(app):
             total_entries = 0
             for an_exercicio in range(2019, 2025):
                 for nr_periodo in range(1, 7):
-                    for no_anexo in ["RREO-Anexo%2001", "RREO-Anexo%2002", "RREO-Anexo%2004", "RREO-Anexo%2006", "RREO-Anexo%2014"]:
+                    for no_anexo in ["RREO-Anexo%2014"]:
                         for ente in entes:
                             cod_ibge = ente['cod_ibge']
                             url = (f"https://apidatalake.tesouro.gov.br/ords/siconfi/tt/rreo?"
@@ -385,11 +385,12 @@ def save_rreo_data_to_db(app, file_path):
             df_novos_dados = df[df['Instituição'].str.contains(municipio_uf, case=False, na=False)]
             df_filtrado = pd.concat([df_filtrado, df_novos_dados])
         
-        # Gerar e salvar CSV na área de trabalho
+        # Gerar e salvar CSV na área de trabalho com o mesmo nome do arquivo original
         user = getpass.getuser()
         desktop_path = os.path.join(f"C:/Users/{user}/Desktop", 'RREO_Uploads')
         os.makedirs(desktop_path, exist_ok=True)
-        output_csv_path = os.path.join(desktop_path, f'arquivo_rreo_editado_{pd.Timestamp.now().strftime("%d%m%Y_%H%M%S")}.csv')
+        original_filename = os.path.basename(file_path)
+        output_csv_path = os.path.join(desktop_path, original_filename)
         df_filtrado.to_csv(output_csv_path, index=False, sep=';', encoding='latin-1')
         print(f"CSV gerado e salvo em: {output_csv_path}")
         
@@ -441,11 +442,12 @@ def save_rreo_data_to_db(app, file_path):
 #         db.session.commit()
 #         print("Dados RREO salvos no banco de dados")
         
-
+#########################RGF######################################
 def save_rgf_data_to_db(app, file_path):
+    # Inicializar o contexto do aplicativo
     with app.app_context():
         # Carregar o CSV
-        lista = ["a", "b", "c", "d", "e", "f", "g", "h","i"]
+        lista = ["a", "b", "c", "d", "e", "f", "g", "h", "i"]
         df = pd.read_csv(file_path, names=lista, sep=';', encoding='latin-1')
         
         # Extração das informações
@@ -453,7 +455,7 @@ def save_rgf_data_to_db(app, file_path):
         periodo = df.loc[1]['a'].replace('Período: ', '')
         anexo = df.loc[3]['a']
         tabela = df.loc[4]['a'].replace('Tabela: ', '')
-
+        
         # Ajuste do DataFrame
         df = df.iloc[5:]
         df.columns = df.iloc[0].tolist()
@@ -466,8 +468,62 @@ def save_rgf_data_to_db(app, file_path):
         # Substituir valores inválidos por None
         df = df.replace({np.nan: None})
         df['Valor'] = df['Valor'].str.replace('.', '').str.replace(',', '.').astype(float)
+        
+        # Obter os municípios de interesse
+        municipios_interesse = fetch_ente()
+        municipios_ibge = {str(item['cod_ibge']): item['ente'] for item in municipios_interesse}  # Converter o código IBGE para string
+        
+        # Filtrar o DataFrame para incluir apenas os municípios de interesse
+        df_filtrado = df[df['Cod.IBGE'].astype(str).isin(municipios_ibge.keys())]  # Converter o código IBGE do DataFrame para string
+        
+        # Verificação e depuração
+        print("Municípios de interesse:")
+        for municipio in municipios_interesse:
+            print(municipio)
+        
+        print("\nCódigos IBGE de interesse:")
+        print(municipios_ibge)
+        
+        print("\nCódigos IBGE presentes no DataFrame filtrado:")
+        print(df_filtrado['Cod.IBGE'].unique())
 
-        for index, row in df.iterrows():
+        # Comparativo
+        print("\nComparativo:")
+        total_municipios = len(municipios_interesse)
+        total_cod_interesse = len(municipios_ibge)
+        total_cod_encontrados = len(df_filtrado['Cod.IBGE'].unique())
+        
+        print(f"Total de municípios da função ente: {total_municipios}")
+        print(f"Total de códigos IBGE de interesse: {total_cod_interesse}")
+        print(f"Total de códigos IBGE encontrados: {total_cod_encontrados}")
+        
+        # Identificar municípios não encontrados
+        cod_ibge_encontrados = set(df_filtrado['Cod.IBGE'].astype(str).unique())  # Converter o código IBGE para string
+        cod_ibge_nao_encontrados = set(municipios_ibge.keys()) - cod_ibge_encontrados
+        
+        municipios_nao_encontrados = {cod: municipios_ibge[cod] for cod in cod_ibge_nao_encontrados}
+        
+        print("\nMunicípios de interesse não encontrados no DataFrame:")
+        for cod_ibge, nome_municipio in municipios_nao_encontrados.items():
+            print(f"{nome_municipio} (Código IBGE: {cod_ibge})")
+        
+        # Procurar novamente os dados faltantes na coluna Instituição e adicioná-los ao DataFrame filtrado
+        for cod_ibge, nome_municipio in municipios_nao_encontrados.items():
+            municipio_uf = f"{nome_municipio} - {cod_ibge[:2]}"  # Adiciona a UF à busca
+            df_novos_dados = df[df['Instituição'].str.contains(municipio_uf, case=False, na=False)]
+            df_filtrado = pd.concat([df_filtrado, df_novos_dados])
+        
+        # Gerar e salvar CSV na área de trabalho com o mesmo nome do arquivo original
+        user = getpass.getuser()
+        desktop_path = os.path.join(f"C:/Users/{user}/Desktop", 'RGF_Uploads')
+        os.makedirs(desktop_path, exist_ok=True)
+        original_filename = os.path.basename(file_path)
+        output_csv_path = os.path.join(desktop_path, original_filename)
+        df_filtrado.to_csv(output_csv_path, index=False, sep=';', encoding='latin-1')
+        print(f"CSV gerado e salvo em: {output_csv_path}")
+        
+        # Salvar os dados no banco de dados
+        for index, row in df_filtrado.iterrows():
             rgf_record = RGF_SICONFI(
                 instituicao=row['Instituição'],
                 codIBGE=row['Cod.IBGE'],
@@ -483,4 +539,80 @@ def save_rgf_data_to_db(app, file_path):
             )
             db.session.add(rgf_record)
         db.session.commit()
-        print("Dados RGF salvos")
+        print("Dados RGF salvos no banco de dados")
+
+
+
+# def save_rgf_data_to_db(app, file_path):
+#     with app.app_context():
+#         # Carregar o CSV
+#         lista = ["a", "b", "c", "d", "e", "f", "g", "h","i"]
+#         df = pd.read_csv(file_path, names=lista, sep=';', encoding='latin-1')
+        
+#         # Extração das informações
+#         exercicio = df.loc[0]['a'].replace('Exercício: ', '')
+#         periodo = df.loc[1]['a'].replace('Período: ', '')
+#         anexo = df.loc[3]['a']
+#         tabela = df.loc[4]['a'].replace('Tabela: ', '')
+
+#         # Ajuste do DataFrame
+#         df = df.iloc[5:]
+#         df.columns = df.iloc[0].tolist()
+#         df = df[1:]
+#         df['Exercicio'] = exercicio
+#         df['Periodo'] = periodo
+#         df['Anexo'] = anexo
+#         df['Tabela'] = tabela
+        
+#         # Substituir valores inválidos por None
+#         df = df.replace({np.nan: None})
+#         df['Valor'] = df['Valor'].str.replace('.', '').str.replace(',', '.').astype(float)
+
+#         for index, row in df.iterrows():
+#             rgf_record = RGF_SICONFI(
+#                 instituicao=row['Instituição'],
+#                 codIBGE=row['Cod.IBGE'],
+#                 uf=row['UF'],
+#                 coluna=row['Coluna'],
+#                 conta=row['Conta'],
+#                 idConta=row['Identificador da Conta'],
+#                 valor=row['Valor'],
+#                 exercicio=row['Exercicio'],
+#                 periodo=row['Periodo'],
+#                 anexo=row['Anexo'],
+#                 tabela=row['Tabela']
+#             )
+#             db.session.add(rgf_record)
+#         db.session.commit()
+#         print("Dados RGF salvos")
+
+
+
+# def save_rgf_data_to_db(app, file_path):
+#     # Inicializar o contexto do aplicativo
+#     with app.app_context():
+#         # Carregar o CSV diretamente
+#         df = pd.read_csv(file_path, sep=';', encoding='latin-1')
+
+#         # Substituir valores inválidos por None
+#         df = df.replace({pd.NA: None, pd.NaT: None})
+
+#         # Salvar os dados no banco de dados
+#         for index, row in df.iterrows():
+#             rgf_record = RGF_SICONFI(
+#                 instituicao=row.get('Instituição'),
+#                 codIBGE=row.get('Cod.IBGE'),
+#                 uf=row.get('UF'),
+#                 coluna=row.get('Coluna'),
+#                 conta=row.get('Conta'),
+#                 idConta=row.get('Identificador da Conta'),
+#                 valor=row.get('Valor'),
+#                 exercicio=row.get('Exercicio'),
+#                 periodo=row.get('Periodo'),
+#                 anexo=row.get('Anexo'),
+#                 tabela=row.get('Tabela')
+#             )
+#             db.session.add(rgf_record)
+        
+#         db.session.commit()
+#         print("Dados RGF salvos no banco de dados")

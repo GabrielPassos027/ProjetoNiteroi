@@ -3,7 +3,7 @@ from app import db
 from flask_login import UserMixin
 
 class SiconfiDataRREO(db.Model):
-    __tablename__ = 'siconfi_data_RREO'
+    __tablename__ = 'RREO_siconfi_anexo_14'
 
     idRREO_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
     instituicao = db.Column('Instituicao', db.String(255))
@@ -21,7 +21,7 @@ class SiconfiDataRREO(db.Model):
 
 
 class SiconfiDataRGF(db.Model):
-    __tablename__ = 'siconfi_data_RGF'
+    __tablename__ = 'RGF_siconfi_dados_novos'
 
     idRGF_siconfi = db.Column(db.Integer, primary_key=True, autoincrement=True)
     instituicao = db.Column('Instituicao', db.String(255))
@@ -100,7 +100,7 @@ class RGF_SICONFI(db.Model):
     instituicao = db.Column('Instituicao', db.String(255))
     codIBGE = db.Column('CodIBGE', db.String(45))
     uf = db.Column('UF', db.String(45))
-    coluna = db.Column('Coluna', db.String(45))
+    coluna = db.Column('Coluna', db.String(255))
     conta = db.Column('Conta', db.String(255))
     idConta = db.Column('IdConta', db.String(100))
     valor = db.Column('Valor', db.Float) 
@@ -117,13 +117,30 @@ class RREO_SICONFI(db.Model):
     uf = db.Column('UF', db.String(45))
     coluna = db.Column('Coluna', db.String(45))
     conta = db.Column('Conta', db.String(255))
-    idConta = db.Column('IdConta', db.String(100))
+    idConta = db.Column('IdConta', db.String(255))
     valor = db.Column('Valor', db.Float) 
     exercicio = db.Column('Exercicio', db.Integer) 
     periodo = db.Column('Periodo', db.String(45))
     anexo = db.Column('Anexo', db.String(255))
     tabela = db.Column('Tabela', db.String(255))
 
+class PatrimonioFER(db.Model):
+    __tablename__ = 'patrimonio_fer'
+    id_patrimonio_fer = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ano = db.Column('ano', db.Integer)
+    mes = db.Column('mes', db.String(10))
+    aportes = db.Column('aportes', db.Numeric(20,2))
+    rendimentos = db.Column('rendimentos', db.Numeric(20,2))
+    patrimonio_fer = db.Column('patriomonio',db.Numeric(20,2))
+
+class RentabilidadeFER(db.Model):
+    __tablename__ = 'rentabilidade_fer'
+    id_patrimonio_fer = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ano = db.Column('ano', db.String(10))
+    liquida = db.Column('liquida', db.Float)
+    relativa = db.Column('relativa(%)', db.Float)
+    #total_liquida = db.Column('total_liquida',db.Float)
+    #total_relativa = db.Column('total_relativa(%)',db.Float)
     
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

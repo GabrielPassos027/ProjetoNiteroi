@@ -21,47 +21,67 @@ def upload_siconfi():
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'Nenhum arquivo selecionado', 400
-        
+
         file = request.files['file']
-        
+
         if file.filename == '':
             return 'Nenhum arquivo selecionado', 400
-        
+
         if file:
             # Salva o arquivo no diretório da área de trabalho do usuário atual
             filename = secure_filename(file.filename)
             desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-            
+
             # Determine o diretório de upload com base no nome do arquivo
             if "finbraRREO" in filename:
                 upload_folder = os.path.join(desktop_path, 'uploads', 'rreo')
             elif "finbraRGF" in filename:
                 upload_folder = os.path.join(desktop_path, 'uploads', 'rgf')
+            elif "FER" in filename:
+                if "Rentabilidade" in filename:
+                    upload_folder = os.path.join(desktop_path, 'uploads', 'fer_rentabilidade')
+                elif "Patrimonio" in filename:
+                    upload_folder = os.path.join(desktop_path, 'uploads', 'fer_patrimonio')
+                else:
+                    return 'Nome de arquivo não reconhecido para FER', 400
             else:
                 return 'Nome de arquivo não reconhecido', 400
-            
+
             # Cria o diretório se não existir
             if not os.path.exists(upload_folder):
                 try:
                     os.makedirs(upload_folder)
                 except Exception as e:
+                    current_app.logger.error(f"Erro ao criar o diretório: {e}")
                     return f"Erro ao criar o diretório: {e}", 500
-            
+
             file_path = os.path.join(upload_folder, filename)
-            
+
             try:
                 file.save(file_path)
-                if 'rreo' in file_path: 
+                current_app.logger.info(f"Arquivo salvo em: {file_path}")
+
+                # Chama o controlador apropriado com base no nome do arquivo
+                if 'rreo' in file_path:
                     from app.controllers.siconfi_controller import save_rreo_data_to_db
                     save_rreo_data_to_db(current_app, file_path)
                 elif 'rgf' in file_path:
-                   from app.controllers.siconfi_controller import save_rgf_data_to_db
-                   save_rgf_data_to_db(current_app, file_path)
+                    from app.controllers.siconfi_controller import save_rgf_data_to_db
+                    save_rgf_data_to_db(current_app, file_path)
+                elif 'fer_rentabilidade' in file_path:
+                    from app.controllers.fer_controller import save_fer_rentabilidade_data_to_db
+                    save_fer_rentabilidade_data_to_db(current_app, file_path)
+                elif 'fer_patrimonio' in file_path:
+                    from app.controllers.fer_controller import save_fer_patrimonio_data_to_db
+                    save_fer_patrimonio_data_to_db(current_app, file_path)
+
                 return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
             except Exception as e:
+                current_app.logger.error(f"Erro ao salvar o arquivo: {e}")
                 return f"Erro ao salvar o arquivo: {e}", 500
-    
+
     return render_template('upload_siconfi.html')
+
 
     
 @main.route('/download_next_report')
