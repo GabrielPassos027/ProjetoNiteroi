@@ -81,43 +81,17 @@ def fetch_ente():
     if response.status_code == 200:
         data = response.json()
         municipios_rio = [
-            "Niterói", "Angra dos Reis", "Aperibé", "Araruama", "Areal", "Armação dos Búzios",
-            "Arraial do Cabo", "Barra do Piraí", "Barra Mansa", "Belford Roxo", "Bom Jardim",
-            "Bom Jesus do Itabapoana", "Cabo Frio", "Cachoeiras de Macacu", "Cambuci", 
-            "Campos dos Goytacazes", "Paraty", "Paty do Alferes", "Petrópolis", "Pinheiral", 
-            "Piraí", "Porciúncula", "Porto Real", "Quatis", "Queimados", "Quissamã", "Resende", 
-            "Rio Bonito", "Rio Claro", "Rio das Flores", "Rio das Ostras", "Rio de Janeiro", 
-            "Santa Maria Madalena", "Santo Antônio de Pádua", "São Fidélis", 
-            "São Francisco de Itabapoana", "São Gonçalo", "São João da Barra", 
-            "São João de Meriti", "São José de Ubá", "São José do Vale do Rio Preto", 
-            "São Pedro da Aldeia", "São Sebastião do Alto", "Sapucaia", "Saquarema", 
-            "Seropédica", "Silva Jardim", "Sumidouro", "Tanguá", "Teresópolis", 
-            "Trajano de Moraes", "Três Rios", "Valença", "Varre-Sai", "Vassouras", "Volta Redonda"
+            "Cantagalo", "Carapebus", "Cardoso Moreira", "Carmo", "Casimiro de Abreu",
+            "Comendador Levy Gasparian", "Conceição de Macabu", "Cordeiro", "Duas Barras",
+            "Duque de Caxias", "Engenheiro Paulo de Frontin", "Guapimirim", "Iguaba Grande",
+            "Itaboraí", "Itaguaí", "Italva", "Itaocara", "Itaperuna", "Itatiaia", "Japeri",
+            "Laje do Muriaé", "Macaé", "Macuco", "Magé", "Mangaratiba", "Maricá", "Mendes",
+            "Mesquita", "Miguel Pereira", "Miracema", "Natividade", "Nilópolis",
+            "Nova Friburgo", "Nova Iguaçu", "Paracambi", "Paraíba do Sul"
         ]
-        municipios_nacionais = {
-            "Vila Velha": "3205200", 
-            "Vitória": "3205309", 
-            "Maringá": "4115200", 
-            "Uberlândia": "3170206", 
-            "São José dos Campos": "3549904", 
-            "Londrina": "4113700", 
-            "Santo André": "3547809", 
-            "Santos": "3548500", 
-            "Florianópolis": "4205407", 
-            "Joinville": "4209102", 
-            "São Caetano do Sul": "3548807"
-        }
 
         # Filtra os dados para obter apenas os municípios do Rio de Janeiro (UF = RJ)
         filtered_data = [item for item in data["items"] if item["ente"] in municipios_rio and item["uf"] == "RJ"]
-        
-        # Adiciona os municípios nacionais à lista filtrada
-        for nome, cod_ibge in municipios_nacionais.items():
-            filtered_data.append({
-                "ente": nome,
-                "cod_ibge": cod_ibge, 
-            })
-        
         print(f"Total de municípios encontrados: {len(filtered_data)}")
         return filtered_data
     else:
@@ -191,8 +165,6 @@ def fetch_siconfi_RREO_data(app):
 
 
 
-
-    
 def fetch_siconfi_RGF_data(app):
     with app.app_context():
         entes = fetch_ente()
