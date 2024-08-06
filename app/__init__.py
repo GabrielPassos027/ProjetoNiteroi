@@ -45,7 +45,7 @@ def create_app():
     app.secret_key = 'abcdefgh12345678'
 
     with app.app_context():
-        from app.models import BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE,RGF_SICONFI,RREO_SICONFI,SiconfiDataRREO,SiconfiDataRGF,User, PatrimonioFER, RentabilidadeFER
+        from app.models import BrentANP, Focus, IPCA_IBGE, Desemprego_IBGE, CAGED_IBGE,RGF_SICONFI,RREO_SICONFI,SiconfiDataRREO,SiconfiDataRGF,User, PatrimonioFER, RentabilidadeFER, IndicadoresDimensoes, IndicadorComposto
         db.create_all()
 
         if not User.query.filter_by(username='Niteroi').first():

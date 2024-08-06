@@ -44,6 +44,8 @@ def upload_siconfi():
                     upload_folder = os.path.join(desktop_path, 'uploads', 'fer_patrimonio')
                 else:
                     return 'Nome de arquivo não reconhecido para FER', 400
+            elif 'UFF' in filename:
+                upload_folder = os.path.join(desktop_path, 'uploads', 'uff')
             else:
                 return 'Nome de arquivo não reconhecido', 400
 
@@ -74,7 +76,10 @@ def upload_siconfi():
                 elif 'fer_patrimonio' in file_path:
                     from app.controllers.fer_controller import save_fer_patrimonio_data_to_db
                     save_fer_patrimonio_data_to_db(current_app, file_path)
-
+                elif 'uff' in file_path:
+                    from app.controllers.uff_controller import save_uff_to_db
+                    save_uff_to_db(current_app, file_path)
+                    
                 return f'Upload realizado com sucesso. Arquivo salvo em: {file_path}', 200
             except Exception as e:
                 current_app.logger.error(f"Erro ao salvar o arquivo: {e}")

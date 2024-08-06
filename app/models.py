@@ -142,6 +142,21 @@ class RentabilidadeFER(db.Model):
     #total_liquida = db.Column('total_liquida',db.Float)
     #total_relativa = db.Column('total_relativa(%)',db.Float)
     
+class IndicadoresDimensoes(db.Model):
+    __tablename__ = 'indicadores_dimensoes_uff'
+    id_indicadores_dimensoes_uff = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ano = db.Column('ano', db.String(10))
+    emprego = db.Column('emprego', db.Numeric(20,4))
+    receitas = db.Column('receitas', db.Numeric(20,4))
+    atividade_geral = db.Column('atividade_geral', db.Numeric(20,4))
+    logistica = db.Column('logistica', db.Numeric(20,4))
+
+class IndicadorComposto(db.Model):
+    __tablename__ = 'indicador_composto_uff'
+    id_indicador_composto_uff = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ano = db.Column('ano', db.String(10))
+    indicador_composto = db.Column('indicador_composto', db.Numeric(20,4))
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
